@@ -1,6 +1,9 @@
+
 # opencan
 linux系统下开源的can测试工具
-基于linux驱动中slcan协议实现socketcan的通信
+基于linux驱动中slcan协议实现socketcan的通信  
+
+![Image text](https://github.com/JiaDuo/opencan/blob/master/hardware/usb2can/hardware.png)
 
 # 硬件介绍  
 硬件使用MicroUSB和PC主机通信，支持一路CAN 2.0B，最大波特率1Mbps
