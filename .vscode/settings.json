@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "usbd_cdc_if.h": "c",
+        "slcan.h": "c"
+    }
+}

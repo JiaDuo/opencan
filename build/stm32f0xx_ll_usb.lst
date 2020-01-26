@@ -1,0 +1,3823 @@
+ARM GAS  /tmp/cclPFygS.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"stm32f0xx_ll_usb.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.USB_CoreInit,"ax",%progbits
+  20              		.align	2
+  21              		.global	USB_CoreInit
+  22              		.code	16
+  23              		.thumb_func
+  25              	USB_CoreInit:
+  26              	.LFB40:
+  27              		.file 1 "Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c"
+   1:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+   2:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   ******************************************************************************
+   3:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @file    stm32f0xx_ll_usb.c
+   4:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @author  MCD Application Team
+   5:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief   USB Low Layer HAL module driver.
+   6:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *
+   7:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *          This file provides firmware functions to manage the following
+   8:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *          functionalities of the USB Peripheral Controller:
+   9:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *           + Initialization/de-initialization functions
+  10:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *           + I/O operation functions
+  11:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *           + Peripheral Control functions
+  12:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *           + Peripheral State functions
+  13:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *
+  14:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   @verbatim
+  15:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   ==============================================================================
+  16:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                     ##### How to use this driver #####
+  17:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   ==============================================================================
+  18:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     [..]
+  19:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       (#) Fill parameters of Init structure in USB_OTG_CfgTypeDef structure.
+  20:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  21:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       (#) Call USB_CoreInit() API to initialize the USB Core peripheral.
+  22:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  23:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       (#) The upper HAL HCD/PCD driver will call the right routines for its internal processes.
+  24:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  25:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   @endverbatim
+  26:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   ******************************************************************************
+  27:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @attention
+  28:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *
+  29:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * <h2><center>&copy; Copyright (c) 2016 STMicroelectronics.
+  30:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * All rights reserved.</center></h2>
+  31:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *
+ARM GAS  /tmp/cclPFygS.s 			page 2
+
+
+  32:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * This software component is licensed by ST under BSD 3-Clause license,
+  33:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * the "License"; You may not use this file except in compliance with the
+  34:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * License. You may obtain a copy of the License at:
+  35:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *                        opensource.org/licenses/BSD-3-Clause
+  36:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *
+  37:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   ******************************************************************************
+  38:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+  39:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  40:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Includes ------------------------------------------------------------------*/
+  41:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #include "stm32f0xx_hal.h"
+  42:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  43:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /** @addtogroup STM32F0xx_LL_USB_DRIVER
+  44:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @{
+  45:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+  46:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  47:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #if defined (HAL_PCD_MODULE_ENABLED) || defined (HAL_HCD_MODULE_ENABLED)
+  48:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #if defined (USB)
+  49:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Private typedef -----------------------------------------------------------*/
+  50:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Private define ------------------------------------------------------------*/
+  51:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Private macro -------------------------------------------------------------*/
+  52:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Private variables ---------------------------------------------------------*/
+  53:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Private function prototypes -----------------------------------------------*/
+  54:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /* Private functions ---------------------------------------------------------*/
+  55:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  56:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  57:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+  58:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  Initializes the USB Core
+  59:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx: USB Instance
+  60:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  cfg : pointer to a USB_CfgTypeDef structure that contains
+  61:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         the configuration information for the specified USBx peripheral.
+  62:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+  63:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+  64:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_CoreInit(USB_TypeDef *USBx, USB_CfgTypeDef cfg)
+  65:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+  28              		.loc 1 65 0
+  29              		.cfi_startproc
+  30              		@ args = 36, pretend = 16, frame = 0
+  31              		@ frame_needed = 0, uses_anonymous_args = 0
+  32              		@ link register save eliminated.
+  33              	.LVL0:
+  34 0000 84B0     		sub	sp, sp, #16
+  35              	.LCFI0:
+  36              		.cfi_def_cfa_offset 16
+  66:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+  67:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+  68:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(cfg);
+  69:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  70:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+  71:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+  72:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+  73:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+  74:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  75:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+  76:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+  37              		.loc 1 76 0
+  38 0002 0020     		movs	r0, #0
+  39              	.LVL1:
+ARM GAS  /tmp/cclPFygS.s 			page 3
+
+
+  65:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+  40              		.loc 1 65 0
+  41 0004 0191     		str	r1, [sp, #4]
+  42 0006 0292     		str	r2, [sp, #8]
+  43 0008 0393     		str	r3, [sp, #12]
+  44              		.loc 1 76 0
+  45              		@ sp needed
+  46 000a 04B0     		add	sp, sp, #16
+  47 000c 7047     		bx	lr
+  48              		.cfi_endproc
+  49              	.LFE40:
+  51 000e C046     		.section	.text.USB_EnableGlobalInt,"ax",%progbits
+  52              		.align	2
+  53              		.global	USB_EnableGlobalInt
+  54              		.code	16
+  55              		.thumb_func
+  57              	USB_EnableGlobalInt:
+  58              	.LFB41:
+  77:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  78:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+  79:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_EnableGlobalInt
+  80:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         Enables the controller's Global Int in the AHB Config reg
+  81:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+  82:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+  83:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+  84:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_EnableGlobalInt(USB_TypeDef *USBx)
+  85:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+  59              		.loc 1 85 0
+  60              		.cfi_startproc
+  61              		@ args = 0, pretend = 0, frame = 0
+  62              		@ frame_needed = 0, uses_anonymous_args = 0
+  63              		@ link register save eliminated.
+  64              	.LVL2:
+  86:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t winterruptmask;
+  87:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  88:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Set winterruptmask variable */
+  89:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   winterruptmask = USB_CNTR_CTRM  | USB_CNTR_WKUPM |
+  90:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                    USB_CNTR_SUSPM | USB_CNTR_ERRM |
+  91:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                    USB_CNTR_SOFM | USB_CNTR_ESOFM |
+  92:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                    USB_CNTR_RESETM | USB_CNTR_L1REQM;
+  93:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  94:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Set interrupt mask */
+  95:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR |= winterruptmask;
+  65              		.loc 1 95 0
+  66 0000 4022     		movs	r2, #64
+  67 0002 034B     		ldr	r3, .L3
+  68 0004 815A     		ldrh	r1, [r0, r2]
+  96:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  97:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+  98:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+  69              		.loc 1 98 0
+  70              		@ sp needed
+  95:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+  71              		.loc 1 95 0
+  72 0006 0B43     		orrs	r3, r1
+  73 0008 8352     		strh	r3, [r0, r2]
+  74              		.loc 1 98 0
+ARM GAS  /tmp/cclPFygS.s 			page 4
+
+
+  75 000a 0020     		movs	r0, #0
+  76              	.LVL3:
+  77 000c 7047     		bx	lr
+  78              	.L4:
+  79 000e C046     		.align	2
+  80              	.L3:
+  81 0010 80BF0000 		.word	49024
+  82              		.cfi_endproc
+  83              	.LFE41:
+  85              		.section	.text.USB_DisableGlobalInt,"ax",%progbits
+  86              		.align	2
+  87              		.global	USB_DisableGlobalInt
+  88              		.code	16
+  89              		.thumb_func
+  91              	USB_DisableGlobalInt:
+  92              	.LFB42:
+  99:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 100:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 101:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_DisableGlobalInt
+ 102:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         Disable the controller's Global Int in the AHB Config reg
+ 103:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 104:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 105:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** */
+ 106:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_DisableGlobalInt(USB_TypeDef *USBx)
+ 107:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+  93              		.loc 1 107 0
+  94              		.cfi_startproc
+  95              		@ args = 0, pretend = 0, frame = 0
+  96              		@ frame_needed = 0, uses_anonymous_args = 0
+  97              		@ link register save eliminated.
+  98              	.LVL4:
+ 108:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t winterruptmask;
+ 109:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 110:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Set winterruptmask variable */
+ 111:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   winterruptmask = USB_CNTR_CTRM  | USB_CNTR_WKUPM |
+ 112:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                    USB_CNTR_SUSPM | USB_CNTR_ERRM |
+ 113:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                    USB_CNTR_SOFM | USB_CNTR_ESOFM |
+ 114:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****                    USB_CNTR_RESETM | USB_CNTR_L1REQM;
+ 115:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 116:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Clear interrupt mask */
+ 117:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR &= ~winterruptmask;
+  99              		.loc 1 117 0
+ 100 0000 4022     		movs	r2, #64
+ 101 0002 034B     		ldr	r3, .L6
+ 102 0004 815A     		ldrh	r1, [r0, r2]
+ 118:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 119:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 120:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 103              		.loc 1 120 0
+ 104              		@ sp needed
+ 117:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 105              		.loc 1 117 0
+ 106 0006 0B40     		ands	r3, r1
+ 107 0008 8352     		strh	r3, [r0, r2]
+ 108              		.loc 1 120 0
+ 109 000a 0020     		movs	r0, #0
+ 110              	.LVL5:
+ARM GAS  /tmp/cclPFygS.s 			page 5
+
+
+ 111 000c 7047     		bx	lr
+ 112              	.L7:
+ 113 000e C046     		.align	2
+ 114              	.L6:
+ 115 0010 7F400000 		.word	16511
+ 116              		.cfi_endproc
+ 117              	.LFE42:
+ 119              		.section	.text.USB_SetCurrentMode,"ax",%progbits
+ 120              		.align	2
+ 121              		.global	USB_SetCurrentMode
+ 122              		.code	16
+ 123              		.thumb_func
+ 125              	USB_SetCurrentMode:
+ 126              	.LFB75:
+ 127              		.cfi_startproc
+ 128              		@ args = 0, pretend = 0, frame = 0
+ 129              		@ frame_needed = 0, uses_anonymous_args = 0
+ 130              		@ link register save eliminated.
+ 131 0000 0020     		movs	r0, #0
+ 132              		@ sp needed
+ 133 0002 7047     		bx	lr
+ 134              		.cfi_endproc
+ 135              	.LFE75:
+ 137              		.section	.text.USB_DevInit,"ax",%progbits
+ 138              		.align	2
+ 139              		.global	USB_DevInit
+ 140              		.code	16
+ 141              		.thumb_func
+ 143              	USB_DevInit:
+ 144              	.LFB44:
+ 121:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 122:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 123:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_SetCurrentMode : Set functional mode
+ 124:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 125:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  mode :  current core mode
+ 126:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *          This parameter can be one of the these values:
+ 127:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *            @arg USB_DEVICE_MODE: Peripheral mode mode
+ 128:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 129:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 130:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_SetCurrentMode(USB_TypeDef *USBx, USB_ModeTypeDef mode)
+ 131:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 132:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 133:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 134:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(mode);
+ 135:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 136:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 137:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 138:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 139:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 140:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 141:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 142:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 143:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 144:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_DevInit : Initializes the USB controller registers
+ 145:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         for device mode
+ 146:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 147:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  cfg  : pointer to a USB_CfgTypeDef structure that contains
+ARM GAS  /tmp/cclPFygS.s 			page 6
+
+
+ 148:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         the configuration information for the specified USBx peripheral.
+ 149:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 150:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 151:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_DevInit(USB_TypeDef *USBx, USB_CfgTypeDef cfg)
+ 152:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 145              		.loc 1 152 0
+ 146              		.cfi_startproc
+ 147              		@ args = 36, pretend = 16, frame = 0
+ 148              		@ frame_needed = 0, uses_anonymous_args = 0
+ 149              		@ link register save eliminated.
+ 150              	.LVL6:
+ 151              		.loc 1 152 0
+ 152 0000 84B0     		sub	sp, sp, #16
+ 153              	.LCFI1:
+ 154              		.cfi_def_cfa_offset 16
+ 155              		.loc 1 152 0
+ 156 0002 0292     		str	r2, [sp, #8]
+ 157 0004 0393     		str	r3, [sp, #12]
+ 153:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 154:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(cfg);
+ 155:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 156:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Init Device */
+ 157:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /*CNTR_FRES = 1*/
+ 158:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR = USB_CNTR_FRES;
+ 158              		.loc 1 158 0
+ 159 0006 0122     		movs	r2, #1
+ 160 0008 4023     		movs	r3, #64
+ 152:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 161              		.loc 1 152 0
+ 162 000a 0191     		str	r1, [sp, #4]
+ 163              		.loc 1 158 0
+ 164 000c C252     		strh	r2, [r0, r3]
+ 159:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 160:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /*CNTR_FRES = 0*/
+ 161:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR = 0;
+ 162:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 163:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /*Clear pending interrupts*/
+ 164:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->ISTR = 0;
+ 165              		.loc 1 164 0
+ 166 000e 4421     		movs	r1, #68
+ 161:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 167              		.loc 1 161 0
+ 168 0010 0022     		movs	r2, #0
+ 169 0012 C252     		strh	r2, [r0, r3]
+ 170              		.loc 1 164 0
+ 171 0014 4252     		strh	r2, [r0, r1]
+ 165:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 166:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /*Set Btable Address*/
+ 167:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->BTABLE = BTABLE_ADDRESS;
+ 172              		.loc 1 167 0
+ 173 0016 0C31     		adds	r1, r1, #12
+ 174 0018 4252     		strh	r2, [r0, r1]
+ 175              	.LVL7:
+ 176              	.LBB27:
+ 177              	.LBB28:
+  95:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 178              		.loc 1 95 0
+ARM GAS  /tmp/cclPFygS.s 			page 7
+
+
+ 179 001a C15A     		ldrh	r1, [r0, r3]
+ 180 001c 024A     		ldr	r2, .L10
+ 181              	.LBE28:
+ 182              	.LBE27:
+ 168:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 169:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Enable USB Device Interrupt mask */
+ 170:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   (void)USB_EnableGlobalInt(USBx);
+ 171:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 172:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 173:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 183              		.loc 1 173 0
+ 184              		@ sp needed
+ 185              	.LBB30:
+ 186              	.LBB29:
+  95:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 187              		.loc 1 95 0
+ 188 001e 0A43     		orrs	r2, r1
+ 189 0020 C252     		strh	r2, [r0, r3]
+ 190              	.LVL8:
+ 191              	.LBE29:
+ 192              	.LBE30:
+ 193              		.loc 1 173 0
+ 194 0022 0020     		movs	r0, #0
+ 195              	.LVL9:
+ 196 0024 04B0     		add	sp, sp, #16
+ 197 0026 7047     		bx	lr
+ 198              	.L11:
+ 199              		.align	2
+ 200              	.L10:
+ 201 0028 80BF0000 		.word	49024
+ 202              		.cfi_endproc
+ 203              	.LFE44:
+ 205              		.section	.text.USB_SetDevSpeed,"ax",%progbits
+ 206              		.align	2
+ 207              		.global	USB_SetDevSpeed
+ 208              		.code	16
+ 209              		.thumb_func
+ 211              	USB_SetDevSpeed:
+ 212              	.LFB45:
+ 174:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 175:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 176:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_SetDevSpeed :Initializes the device speed
+ 177:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         depending on the PHY type and the enumeration speed of the device.
+ 178:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx  Selected device
+ 179:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  speed  device speed
+ 180:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval  Hal status
+ 181:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 182:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_SetDevSpeed(USB_TypeDef *USBx, uint8_t speed)
+ 183:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 213              		.loc 1 183 0
+ 214              		.cfi_startproc
+ 215              		@ args = 0, pretend = 0, frame = 0
+ 216              		@ frame_needed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+ 218              	.LVL10:
+ 184:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 185:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ARM GAS  /tmp/cclPFygS.s 			page 8
+
+
+ 186:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(speed);
+ 187:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 188:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 189:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 190:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 191:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 192:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 193:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 194:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 219              		.loc 1 194 0
+ 220 0000 0020     		movs	r0, #0
+ 221              	.LVL11:
+ 222              		@ sp needed
+ 223 0002 7047     		bx	lr
+ 224              		.cfi_endproc
+ 225              	.LFE45:
+ 227              		.section	.text.USB_FlushTxFifo,"ax",%progbits
+ 228              		.align	2
+ 229              		.global	USB_FlushTxFifo
+ 230              		.code	16
+ 231              		.thumb_func
+ 233              	USB_FlushTxFifo:
+ 234              	.LFB46:
+ 195:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 196:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 197:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_FlushTxFifo : Flush a Tx FIFO
+ 198:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 199:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  num : FIFO number
+ 200:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         This parameter can be a value from 1 to 15
+ 201:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             15 means Flush all Tx FIFOs
+ 202:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 203:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 204:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_FlushTxFifo(USB_TypeDef *USBx, uint32_t num)
+ 205:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 235              		.loc 1 205 0
+ 236              		.cfi_startproc
+ 237              		@ args = 0, pretend = 0, frame = 0
+ 238              		@ frame_needed = 0, uses_anonymous_args = 0
+ 239              		@ link register save eliminated.
+ 240              	.LVL12:
+ 206:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 207:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 208:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(num);
+ 209:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 210:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 211:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 212:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 213:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 214:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 215:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 216:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 241              		.loc 1 216 0
+ 242 0000 0020     		movs	r0, #0
+ 243              	.LVL13:
+ 244              		@ sp needed
+ 245 0002 7047     		bx	lr
+ 246              		.cfi_endproc
+ARM GAS  /tmp/cclPFygS.s 			page 9
+
+
+ 247              	.LFE46:
+ 249              		.section	.text.USB_FlushRxFifo,"ax",%progbits
+ 250              		.align	2
+ 251              		.global	USB_FlushRxFifo
+ 252              		.code	16
+ 253              		.thumb_func
+ 255              	USB_FlushRxFifo:
+ 256              	.LFB47:
+ 217:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 218:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 219:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_FlushRxFifo : Flush Rx FIFO
+ 220:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 221:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 222:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 223:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_FlushRxFifo(USB_TypeDef *USBx)
+ 224:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 257              		.loc 1 224 0
+ 258              		.cfi_startproc
+ 259              		@ args = 0, pretend = 0, frame = 0
+ 260              		@ frame_needed = 0, uses_anonymous_args = 0
+ 261              		@ link register save eliminated.
+ 262              	.LVL14:
+ 225:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 226:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 227:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 228:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 229:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 230:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 231:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 232:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 233:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 234:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 263              		.loc 1 234 0
+ 264 0000 0020     		movs	r0, #0
+ 265              	.LVL15:
+ 266              		@ sp needed
+ 267 0002 7047     		bx	lr
+ 268              		.cfi_endproc
+ 269              	.LFE47:
+ 271              		.section	.text.USB_ActivateEndpoint,"ax",%progbits
+ 272              		.align	2
+ 273              		.global	USB_ActivateEndpoint
+ 274              		.code	16
+ 275              		.thumb_func
+ 277              	USB_ActivateEndpoint:
+ 278              	.LFB48:
+ 235:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 236:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 237:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  Activate and configure an endpoint
+ 238:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 239:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  ep: pointer to endpoint structure
+ 240:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 241:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 242:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_ActivateEndpoint(USB_TypeDef *USBx, USB_EPTypeDef *ep)
+ 243:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 279              		.loc 1 243 0
+ 280              		.cfi_startproc
+ARM GAS  /tmp/cclPFygS.s 			page 10
+
+
+ 281              		@ args = 0, pretend = 0, frame = 0
+ 282              		@ frame_needed = 0, uses_anonymous_args = 0
+ 283              	.LVL16:
+ 284 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 285              	.LCFI2:
+ 286              		.cfi_def_cfa_offset 20
+ 287              		.cfi_offset 4, -20
+ 288              		.cfi_offset 5, -16
+ 289              		.cfi_offset 6, -12
+ 290              		.cfi_offset 7, -8
+ 291              		.cfi_offset 14, -4
+ 244:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   HAL_StatusTypeDef ret = HAL_OK;
+ 245:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t wEpRegVal;
+ 246:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 247:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   wEpRegVal = PCD_GET_ENDPOINT(USBx, ep->num) & USB_EP_T_MASK;
+ 292              		.loc 1 247 0
+ 293 0002 0C78     		ldrb	r4, [r1]
+ 243:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   HAL_StatusTypeDef ret = HAL_OK;
+ 294              		.loc 1 243 0
+ 295 0004 0300     		movs	r3, r0
+ 296              		.loc 1 247 0
+ 297 0006 A400     		lsls	r4, r4, #2
+ 298 0008 0419     		adds	r4, r0, r4
+ 299 000a 2088     		ldrh	r0, [r4]
+ 300              	.LVL17:
+ 301 000c A64A     		ldr	r2, .L62
+ 302 000e 0240     		ands	r2, r0
+ 303              	.LVL18:
+ 248:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 249:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* initialize Endpoint */
+ 250:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   switch (ep->type)
+ 304              		.loc 1 250 0
+ 305 0010 C878     		ldrb	r0, [r1, #3]
+ 306 0012 0128     		cmp	r0, #1
+ 307 0014 00D1     		bne	.LCB218
+ 308 0016 1FE1     		b	.L17	@long jump
+ 309              	.LCB218:
+ 310 0018 0028     		cmp	r0, #0
+ 311 001a 00D1     		bne	.LCB220
+ 312 001c 17E1     		b	.L18	@long jump
+ 313              	.LCB220:
+ 314 001e 0228     		cmp	r0, #2
+ 315 0020 42D0     		beq	.L39
+ 316 0022 0328     		cmp	r0, #3
+ 317 0024 00D1     		bne	.LCB224
+ 318 0026 0DE1     		b	.L20	@long jump
+ 319              	.LCB224:
+ 251:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 252:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     case EP_TYPE_CTRL:
+ 253:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       wEpRegVal |= USB_EP_CONTROL;
+ 254:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 255:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 256:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     case EP_TYPE_BULK:
+ 257:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       wEpRegVal |= USB_EP_BULK;
+ 258:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 259:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 260:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     case EP_TYPE_INTR:
+ARM GAS  /tmp/cclPFygS.s 			page 11
+
+
+ 261:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       wEpRegVal |= USB_EP_INTERRUPT;
+ 262:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 263:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 264:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     case EP_TYPE_ISOC:
+ 265:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       wEpRegVal |= USB_EP_ISOCHRONOUS;
+ 266:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 267:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 268:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     default:
+ 269:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       ret = HAL_ERROR;
+ 320              		.loc 1 269 0
+ 321 0028 0120     		movs	r0, #1
+ 322              	.L19:
+ 323              	.LVL19:
+ 270:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 271:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 272:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 273:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   PCD_SET_ENDPOINT(USBx, ep->num, wEpRegVal | USB_EP_CTR_RX | USB_EP_CTR_TX);
+ 324              		.loc 1 273 0
+ 325 002a A04E     		ldr	r6, .L62+4
+ 326              	.LBB31:
+ 274:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 275:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   PCD_SET_EP_ADDRESS(USBx, ep->num, ep->num);
+ 327              		.loc 1 275 0
+ 328 002c A04F     		ldr	r7, .L62+8
+ 329              	.LBE31:
+ 273:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 330              		.loc 1 273 0
+ 331 002e 3243     		orrs	r2, r6
+ 332              	.LVL20:
+ 333 0030 92B2     		uxth	r2, r2
+ 334 0032 2280     		strh	r2, [r4]
+ 335              	.LBB32:
+ 336              		.loc 1 275 0
+ 337 0034 0A78     		ldrb	r2, [r1]
+ 338 0036 9400     		lsls	r4, r2, #2
+ 339 0038 1C19     		adds	r4, r3, r4
+ 340 003a 2588     		ldrh	r5, [r4]
+ 341              	.LVL21:
+ 342 003c 3D40     		ands	r5, r7
+ 343              	.LVL22:
+ 344 003e 2A43     		orrs	r2, r5
+ 345 0040 3243     		orrs	r2, r6
+ 346 0042 92B2     		uxth	r2, r2
+ 347 0044 2280     		strh	r2, [r4]
+ 348              	.LBE32:
+ 276:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 277:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->doublebuffer == 0U)
+ 349              		.loc 1 277 0
+ 350 0046 0A7B     		ldrb	r2, [r1, #12]
+ 351 0048 002A     		cmp	r2, #0
+ 352 004a 2FD1     		bne	.L21
+ 278:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 279:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->is_in != 0U)
+ 353              		.loc 1 279 0
+ 354 004c 4A78     		ldrb	r2, [r1, #1]
+ 355 004e 002A     		cmp	r2, #0
+ 356 0050 00D1     		bne	.LCB258
+ARM GAS  /tmp/cclPFygS.s 			page 12
+
+
+ 357 0052 BFE0     		b	.L22	@long jump
+ 358              	.LCB258:
+ 359              	.LVL23:
+ 360              	.LBB33:
+ 280:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 281:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /*Set the endpoint Transmit buffer address */
+ 282:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_TX_ADDRESS(USBx, ep->num, ep->pmaadress);
+ 361              		.loc 1 282 0
+ 362 0054 5022     		movs	r2, #80
+ 363 0056 9C5A     		ldrh	r4, [r3, r2]
+ 364              	.LVL24:
+ 365 0058 0A78     		ldrb	r2, [r1]
+ 366              	.LVL25:
+ 367 005a 0125     		movs	r5, #1
+ 368 005c D200     		lsls	r2, r2, #3
+ 369              	.LVL26:
+ 370 005e 9A18     		adds	r2, r3, r2
+ 371 0060 1219     		adds	r2, r2, r4
+ 372 0062 8024     		movs	r4, #128
+ 373              	.LVL27:
+ 374 0064 E400     		lsls	r4, r4, #3
+ 375 0066 A446     		mov	ip, r4
+ 376 0068 CC88     		ldrh	r4, [r1, #6]
+ 377 006a 6244     		add	r2, r2, ip
+ 378 006c AC43     		bics	r4, r5
+ 379 006e 1480     		strh	r4, [r2]
+ 380              	.LBE33:
+ 381              	.LBB34:
+ 283:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 382              		.loc 1 283 0
+ 383 0070 0A78     		ldrb	r2, [r1]
+ 384 0072 9200     		lsls	r2, r2, #2
+ 385 0074 9A18     		adds	r2, r3, r2
+ 386 0076 1488     		ldrh	r4, [r2]
+ 387              	.LVL28:
+ 388 0078 6406     		lsls	r4, r4, #25
+ 389 007a 07D5     		bpl	.L23
+ 390              	.LVL29:
+ 391              	.LBB35:
+ 392              		.loc 1 283 0 is_stmt 0 discriminator 1
+ 393 007c 1488     		ldrh	r4, [r2]
+ 394              	.LVL30:
+ 395 007e 2740     		ands	r7, r4
+ 396 0080 8C4C     		ldr	r4, .L62+12
+ 397              	.LVL31:
+ 398 0082 2743     		orrs	r7, r4
+ 399 0084 1780     		strh	r7, [r2]
+ 400 0086 0A78     		ldrb	r2, [r1]
+ 401 0088 9200     		lsls	r2, r2, #2
+ 402 008a 9A18     		adds	r2, r3, r2
+ 403              	.L23:
+ 404              	.LBE35:
+ 405              	.LBE34:
+ 284:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 285:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       if (ep->type != EP_TYPE_ISOC)
+ 406              		.loc 1 285 0 is_stmt 1
+ 407 008c CB78     		ldrb	r3, [r1, #3]
+ARM GAS  /tmp/cclPFygS.s 			page 13
+
+
+ 408              	.LVL32:
+ 409              	.LBB36:
+ 286:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 287:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Configure NAK status for the Endpoint */
+ 288:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_NAK);
+ 410              		.loc 1 288 0
+ 411 008e 1188     		ldrh	r1, [r2]
+ 412              	.LVL33:
+ 413              	.LBE36:
+ 285:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 414              		.loc 1 285 0
+ 415 0090 012B     		cmp	r3, #1
+ 416 0092 00D1     		bne	.LCB323
+ 417 0094 F6E0     		b	.L24	@long jump
+ 418              	.LCB323:
+ 419              	.LBB37:
+ 420              		.loc 1 288 0
+ 421 0096 884B     		ldr	r3, .L62+16
+ 422 0098 0B40     		ands	r3, r1
+ 423              	.LVL34:
+ 424 009a 2021     		movs	r1, #32
+ 425 009c 4B40     		eors	r3, r1
+ 426              	.LVL35:
+ 427 009e 8349     		ldr	r1, .L62+4
+ 428 00a0 0B43     		orrs	r3, r1
+ 429 00a2 9BB2     		uxth	r3, r3
+ 430 00a4 1380     		strh	r3, [r2]
+ 431              	.LBE37:
+ 432 00a6 5BE0     		b	.L25
+ 433              	.LVL36:
+ 434              	.L39:
+ 244:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t wEpRegVal;
+ 435              		.loc 1 244 0
+ 436 00a8 0020     		movs	r0, #0
+ 437 00aa BEE7     		b	.L19
+ 438              	.LVL37:
+ 439              	.L21:
+ 440              	.LBB38:
+ 289:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 290:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       else
+ 291:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 292:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Configure TX Endpoint to disabled state */
+ 293:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_DIS);
+ 294:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 295:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 296:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 297:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 298:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /*Set the endpoint Receive buffer address */
+ 299:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_ADDRESS(USBx, ep->num, ep->pmaadress);
+ 300:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /*Set the endpoint Receive buffer counter*/
+ 301:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_CNT(USBx, ep->num, ep->maxpacket);
+ 302:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 303:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure VALID status for the Endpoint*/
+ 304:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_VALID);
+ 305:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 306:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 307:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /*Double Buffer*/
+ARM GAS  /tmp/cclPFygS.s 			page 14
+
+
+ 308:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   else
+ 309:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 310:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* Set the endpoint as double buffered */
+ 311:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     PCD_SET_EP_DBUF(USBx, ep->num);
+ 312:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* Set buffer address for double buffered mode */
+ 313:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     PCD_SET_EP_DBUF_ADDR(USBx, ep->num, ep->pmaaddr0, ep->pmaaddr1);
+ 441              		.loc 1 313 0
+ 442 00ac 5026     		movs	r6, #80
+ 443              	.LBE38:
+ 444              	.LBB39:
+ 311:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* Set buffer address for double buffered mode */
+ 445              		.loc 1 311 0
+ 446 00ae 0A78     		ldrb	r2, [r1]
+ 447 00b0 824D     		ldr	r5, .L62+20
+ 448 00b2 9200     		lsls	r2, r2, #2
+ 449 00b4 9A18     		adds	r2, r3, r2
+ 450 00b6 1488     		ldrh	r4, [r2]
+ 451              	.LVL38:
+ 452 00b8 3C40     		ands	r4, r7
+ 453              	.LVL39:
+ 454 00ba 2C43     		orrs	r4, r5
+ 455 00bc 1480     		strh	r4, [r2]
+ 456              	.LVL40:
+ 457              	.LBE39:
+ 458              	.LBB40:
+ 459              		.loc 1 313 0
+ 460 00be 0A78     		ldrb	r2, [r1]
+ 461 00c0 9C5B     		ldrh	r4, [r3, r6]
+ 462              	.LVL41:
+ 463 00c2 D200     		lsls	r2, r2, #3
+ 464              	.LVL42:
+ 465 00c4 D218     		adds	r2, r2, r3
+ 466 00c6 1219     		adds	r2, r2, r4
+ 467 00c8 8024     		movs	r4, #128
+ 468              	.LVL43:
+ 469 00ca E400     		lsls	r4, r4, #3
+ 470 00cc A446     		mov	ip, r4
+ 471 00ce 0125     		movs	r5, #1
+ 472 00d0 0C89     		ldrh	r4, [r1, #8]
+ 473 00d2 6244     		add	r2, r2, ip
+ 474 00d4 AC43     		bics	r4, r5
+ 475 00d6 1480     		strh	r4, [r2]
+ 476              	.LVL44:
+ 477              	.LBE40:
+ 478              	.LBB41:
+ 479 00d8 0A78     		ldrb	r2, [r1]
+ 480 00da 9C5B     		ldrh	r4, [r3, r6]
+ 481              	.LVL45:
+ 482 00dc D200     		lsls	r2, r2, #3
+ 483              	.LVL46:
+ 484 00de D218     		adds	r2, r2, r3
+ 485 00e0 1219     		adds	r2, r2, r4
+ 486 00e2 774C     		ldr	r4, .L62+24
+ 487              	.LVL47:
+ 488 00e4 A446     		mov	ip, r4
+ 489 00e6 4C89     		ldrh	r4, [r1, #10]
+ 490 00e8 6244     		add	r2, r2, ip
+ARM GAS  /tmp/cclPFygS.s 			page 15
+
+
+ 491 00ea AC43     		bics	r4, r5
+ 492 00ec 1480     		strh	r4, [r2]
+ 493              	.LBE41:
+ 314:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 315:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->is_in == 0U)
+ 494              		.loc 1 315 0
+ 495 00ee 4A78     		ldrb	r2, [r1, #1]
+ 496 00f0 002A     		cmp	r2, #0
+ 497 00f2 36D1     		bne	.L32
+ 498              	.LBB42:
+ 316:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 317:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Clear the data toggle bits for the endpoint IN/OUT */
+ 318:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 499              		.loc 1 318 0
+ 500 00f4 0A78     		ldrb	r2, [r1]
+ 501 00f6 9200     		lsls	r2, r2, #2
+ 502 00f8 9A18     		adds	r2, r3, r2
+ 503 00fa 1488     		ldrh	r4, [r2]
+ 504              	.LVL48:
+ 505 00fc 6404     		lsls	r4, r4, #17
+ 506 00fe 07D5     		bpl	.L33
+ 507              	.LVL49:
+ 508              	.LBB43:
+ 509              		.loc 1 318 0 is_stmt 0 discriminator 1
+ 510 0100 1488     		ldrh	r4, [r2]
+ 511              	.LVL50:
+ 512 0102 2740     		ands	r7, r4
+ 513 0104 6F4C     		ldr	r4, .L62+28
+ 514              	.LVL51:
+ 515 0106 2743     		orrs	r7, r4
+ 516 0108 1780     		strh	r7, [r2]
+ 517 010a 0A78     		ldrb	r2, [r1]
+ 518 010c 9200     		lsls	r2, r2, #2
+ 519 010e 9A18     		adds	r2, r3, r2
+ 520              	.L33:
+ 521              	.LBE43:
+ 522              	.LBE42:
+ 523              	.LBB44:
+ 319:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 524              		.loc 1 319 0 is_stmt 1
+ 525 0110 1488     		ldrh	r4, [r2]
+ 526              	.LVL52:
+ 527 0112 6406     		lsls	r4, r4, #25
+ 528 0114 08D5     		bpl	.L34
+ 529              	.LVL53:
+ 530              	.LBB45:
+ 531              		.loc 1 319 0 is_stmt 0 discriminator 1
+ 532 0116 1588     		ldrh	r5, [r2]
+ 533              	.LVL54:
+ 534 0118 654C     		ldr	r4, .L62+8
+ 535 011a 2C40     		ands	r4, r5
+ 536 011c 654D     		ldr	r5, .L62+12
+ 537              	.LVL55:
+ 538 011e 2C43     		orrs	r4, r5
+ 539 0120 1480     		strh	r4, [r2]
+ 540 0122 0A78     		ldrb	r2, [r1]
+ 541 0124 9200     		lsls	r2, r2, #2
+ARM GAS  /tmp/cclPFygS.s 			page 16
+
+
+ 542 0126 9A18     		adds	r2, r3, r2
+ 543              	.L34:
+ 544              	.LBE45:
+ 545              	.LBE44:
+ 546              	.LBB46:
+ 320:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 321:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Reset value of the data toggle bits for the endpoint out */
+ 322:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_TX_DTOG(USBx, ep->num);
+ 547              		.loc 1 322 0 is_stmt 1
+ 548 0128 1588     		ldrh	r5, [r2]
+ 549              	.LVL56:
+ 550 012a 614C     		ldr	r4, .L62+8
+ 551 012c 2C40     		ands	r4, r5
+ 552 012e 614D     		ldr	r5, .L62+12
+ 553              	.LVL57:
+ 554 0130 2C43     		orrs	r4, r5
+ 555 0132 1480     		strh	r4, [r2]
+ 556              	.LBE46:
+ 557              	.LBB47:
+ 323:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 324:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_VALID);
+ 558              		.loc 1 324 0
+ 559 0134 0C78     		ldrb	r4, [r1]
+ 560 0136 644A     		ldr	r2, .L62+32
+ 561 0138 A400     		lsls	r4, r4, #2
+ 562 013a 1C19     		adds	r4, r3, r4
+ 563 013c 2588     		ldrh	r5, [r4]
+ 564 013e 2A40     		ands	r2, r5
+ 565              	.LVL58:
+ 566 0140 C025     		movs	r5, #192
+ 567 0142 AD01     		lsls	r5, r5, #6
+ 568 0144 6A40     		eors	r2, r5
+ 569              	.LVL59:
+ 570 0146 594D     		ldr	r5, .L62+4
+ 571 0148 2A43     		orrs	r2, r5
+ 572              	.LVL60:
+ 573 014a 92B2     		uxth	r2, r2
+ 574 014c 2280     		strh	r2, [r4]
+ 575              	.LBE47:
+ 576              	.LBB48:
+ 325:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_DIS);
+ 577              		.loc 1 325 0
+ 578 014e 0978     		ldrb	r1, [r1]
+ 579              	.LVL61:
+ 580 0150 8900     		lsls	r1, r1, #2
+ 581 0152 5B18     		adds	r3, r3, r1
+ 582              	.LVL62:
+ 583 0154 1A88     		ldrh	r2, [r3]
+ 584              	.LVL63:
+ 585 0156 5849     		ldr	r1, .L62+16
+ 586 0158 0A40     		ands	r2, r1
+ 587              	.LVL64:
+ 588 015a 2A43     		orrs	r2, r5
+ 589 015c 92B2     		uxth	r2, r2
+ 590 015e 1A80     		strh	r2, [r3]
+ 591              	.L25:
+ 592              	.LBE48:
+ARM GAS  /tmp/cclPFygS.s 			page 17
+
+
+ 326:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 327:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 328:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 329:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Clear the data toggle bits for the endpoint IN/OUT */
+ 330:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 331:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 332:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_RX_DTOG(USBx, ep->num);
+ 333:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 334:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       if (ep->type != EP_TYPE_ISOC)
+ 335:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 336:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Configure NAK status for the Endpoint */
+ 337:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_NAK);
+ 338:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 339:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       else
+ 340:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 341:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Configure TX Endpoint to disabled state */
+ 342:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_DIS);
+ 343:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 344:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 345:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_DIS);
+ 346:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 347:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 348:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 349:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return ret;
+ 350:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 593              		.loc 1 350 0
+ 594              		@ sp needed
+ 595 0160 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 596              	.LVL65:
+ 597              	.L32:
+ 598              	.LBB49:
+ 330:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 599              		.loc 1 330 0
+ 600 0162 0A78     		ldrb	r2, [r1]
+ 601 0164 9200     		lsls	r2, r2, #2
+ 602 0166 9D18     		adds	r5, r3, r2
+ 603 0168 2A88     		ldrh	r2, [r5]
+ 604              	.LVL66:
+ 605 016a 5204     		lsls	r2, r2, #17
+ 606 016c 07D5     		bpl	.L35
+ 607              	.LVL67:
+ 608              	.LBB50:
+ 330:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 609              		.loc 1 330 0 is_stmt 0 discriminator 1
+ 610 016e 2A88     		ldrh	r2, [r5]
+ 611              	.LVL68:
+ 612 0170 1740     		ands	r7, r2
+ 613 0172 544A     		ldr	r2, .L62+28
+ 614              	.LVL69:
+ 615 0174 1743     		orrs	r7, r2
+ 616 0176 2F80     		strh	r7, [r5]
+ 617 0178 0A78     		ldrb	r2, [r1]
+ 618 017a 9200     		lsls	r2, r2, #2
+ 619 017c 9D18     		adds	r5, r3, r2
+ 620              	.L35:
+ 621              	.LBE50:
+ 622              	.LBE49:
+ARM GAS  /tmp/cclPFygS.s 			page 18
+
+
+ 623              	.LBB51:
+ 331:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_RX_DTOG(USBx, ep->num);
+ 624              		.loc 1 331 0 is_stmt 1
+ 625 017e 2A88     		ldrh	r2, [r5]
+ 626              	.LVL70:
+ 627 0180 5206     		lsls	r2, r2, #25
+ 628 0182 08D5     		bpl	.L36
+ 629              	.LVL71:
+ 630              	.LBB52:
+ 331:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_RX_DTOG(USBx, ep->num);
+ 631              		.loc 1 331 0 is_stmt 0 discriminator 1
+ 632 0184 2C88     		ldrh	r4, [r5]
+ 633              	.LVL72:
+ 634 0186 4A4A     		ldr	r2, .L62+8
+ 635 0188 2240     		ands	r2, r4
+ 636 018a 4A4C     		ldr	r4, .L62+12
+ 637              	.LVL73:
+ 638 018c 2243     		orrs	r2, r4
+ 639 018e 2A80     		strh	r2, [r5]
+ 640 0190 0A78     		ldrb	r2, [r1]
+ 641 0192 9200     		lsls	r2, r2, #2
+ 642 0194 9D18     		adds	r5, r3, r2
+ 643              	.L36:
+ 644              	.LBE52:
+ 645              	.LBE51:
+ 646              	.LBB53:
+ 332:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 647              		.loc 1 332 0 is_stmt 1
+ 648 0196 2C88     		ldrh	r4, [r5]
+ 649              	.LVL74:
+ 650 0198 454A     		ldr	r2, .L62+8
+ 651 019a 2240     		ands	r2, r4
+ 652 019c 494C     		ldr	r4, .L62+28
+ 653              	.LVL75:
+ 654 019e 2243     		orrs	r2, r4
+ 655 01a0 2A80     		strh	r2, [r5]
+ 656              	.LBE53:
+ 334:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 657              		.loc 1 334 0
+ 658 01a2 CA78     		ldrb	r2, [r1, #3]
+ 659 01a4 012A     		cmp	r2, #1
+ 660 01a6 63D0     		beq	.L37
+ 661              	.LBB54:
+ 337:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 662              		.loc 1 337 0
+ 663 01a8 0D78     		ldrb	r5, [r1]
+ 664 01aa 434A     		ldr	r2, .L62+16
+ 665 01ac AD00     		lsls	r5, r5, #2
+ 666 01ae 5D19     		adds	r5, r3, r5
+ 667 01b0 2C88     		ldrh	r4, [r5]
+ 668 01b2 2240     		ands	r2, r4
+ 669              	.LVL76:
+ 670 01b4 2024     		movs	r4, #32
+ 671 01b6 6240     		eors	r2, r4
+ 672              	.LVL77:
+ 673 01b8 3C4C     		ldr	r4, .L62+4
+ 674 01ba 2243     		orrs	r2, r4
+ARM GAS  /tmp/cclPFygS.s 			page 19
+
+
+ 675 01bc 92B2     		uxth	r2, r2
+ 676 01be 2A80     		strh	r2, [r5]
+ 677              	.L38:
+ 678              	.LBE54:
+ 679              	.LBB55:
+ 345:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 680              		.loc 1 345 0
+ 681 01c0 0A78     		ldrb	r2, [r1]
+ 682 01c2 9200     		lsls	r2, r2, #2
+ 683 01c4 9B18     		adds	r3, r3, r2
+ 684              	.LVL78:
+ 685 01c6 1988     		ldrh	r1, [r3]
+ 686              	.LVL79:
+ 687 01c8 3F4A     		ldr	r2, .L62+32
+ 688 01ca 0A40     		ands	r2, r1
+ 689 01cc 3F49     		ldr	r1, .L62+36
+ 690              	.LVL80:
+ 691 01ce 0A43     		orrs	r2, r1
+ 692 01d0 1A80     		strh	r2, [r3]
+ 693 01d2 C5E7     		b	.L25
+ 694              	.LVL81:
+ 695              	.L22:
+ 696              	.LBE55:
+ 697              	.LBB56:
+ 299:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /*Set the endpoint Receive buffer counter*/
+ 698              		.loc 1 299 0
+ 699 01d4 5027     		movs	r7, #80
+ 700 01d6 0A78     		ldrb	r2, [r1]
+ 701 01d8 DC5B     		ldrh	r4, [r3, r7]
+ 702              	.LVL82:
+ 703 01da D200     		lsls	r2, r2, #3
+ 704              	.LVL83:
+ 705 01dc D218     		adds	r2, r2, r3
+ 706 01de 1219     		adds	r2, r2, r4
+ 707 01e0 374C     		ldr	r4, .L62+24
+ 708              	.LVL84:
+ 709 01e2 0126     		movs	r6, #1
+ 710 01e4 A446     		mov	ip, r4
+ 711 01e6 CD88     		ldrh	r5, [r1, #6]
+ 712 01e8 6244     		add	r2, r2, ip
+ 713 01ea B543     		bics	r5, r6
+ 714 01ec 1580     		strh	r5, [r2]
+ 715              	.LVL85:
+ 716              	.LBE56:
+ 717              	.LBB57:
+ 301:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 718              		.loc 1 301 0
+ 719 01ee 384D     		ldr	r5, .L62+40
+ 720 01f0 DC5B     		ldrh	r4, [r3, r7]
+ 721              	.LVL86:
+ 722 01f2 AC46     		mov	ip, r5
+ 723 01f4 0A78     		ldrb	r2, [r1]
+ 724 01f6 6444     		add	r4, r4, ip
+ 725              	.LVL87:
+ 726 01f8 D200     		lsls	r2, r2, #3
+ 727 01fa 1219     		adds	r2, r2, r4
+ 728              	.LBB58:
+ARM GAS  /tmp/cclPFygS.s 			page 20
+
+
+ 729 01fc 0C69     		ldr	r4, [r1, #16]
+ 730              	.LVL88:
+ 731              	.LBE58:
+ 732 01fe D218     		adds	r2, r2, r3
+ 733              	.LVL89:
+ 734              	.LBB59:
+ 735 0200 002C     		cmp	r4, #0
+ 736 0202 2ED0     		beq	.L61
+ 301:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 737              		.loc 1 301 0 is_stmt 0 discriminator 2
+ 738 0204 3E2C     		cmp	r4, #62
+ 739 0206 43D8     		bhi	.L28
+ 301:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 740              		.loc 1 301 0 discriminator 3
+ 741 0208 6508     		lsrs	r5, r4, #1
+ 742              	.LVL90:
+ 743 020a 3440     		ands	r4, r6
+ 744 020c 2D19     		adds	r5, r5, r4
+ 745              	.LVL91:
+ 746 020e AD02     		lsls	r5, r5, #10
+ 747              	.LVL92:
+ 748 0210 1580     		strh	r5, [r2]
+ 749              	.LVL93:
+ 750              	.L27:
+ 751              	.LBE59:
+ 752              	.LBE57:
+ 753              	.LBB62:
+ 302:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure VALID status for the Endpoint*/
+ 754              		.loc 1 302 0 is_stmt 1
+ 755 0212 0A78     		ldrb	r2, [r1]
+ 756              	.LVL94:
+ 757 0214 9200     		lsls	r2, r2, #2
+ 758 0216 9A18     		adds	r2, r3, r2
+ 759 0218 1488     		ldrh	r4, [r2]
+ 760              	.LVL95:
+ 761 021a 6404     		lsls	r4, r4, #17
+ 762 021c 08D5     		bpl	.L31
+ 763              	.LVL96:
+ 764              	.LBB63:
+ 302:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure VALID status for the Endpoint*/
+ 765              		.loc 1 302 0 is_stmt 0 discriminator 1
+ 766 021e 1588     		ldrh	r5, [r2]
+ 767              	.LVL97:
+ 768 0220 234C     		ldr	r4, .L62+8
+ 769 0222 2C40     		ands	r4, r5
+ 770 0224 274D     		ldr	r5, .L62+28
+ 771              	.LVL98:
+ 772 0226 2C43     		orrs	r4, r5
+ 773 0228 1480     		strh	r4, [r2]
+ 774 022a 0A78     		ldrb	r2, [r1]
+ 775 022c 9200     		lsls	r2, r2, #2
+ 776 022e 9A18     		adds	r2, r3, r2
+ 777              	.L31:
+ 778              	.LBE63:
+ 779              	.LBE62:
+ 780              	.LBB64:
+ 304:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ARM GAS  /tmp/cclPFygS.s 			page 21
+
+
+ 781              		.loc 1 304 0 is_stmt 1
+ 782 0230 1188     		ldrh	r1, [r2]
+ 783              	.LVL99:
+ 784 0232 254B     		ldr	r3, .L62+32
+ 785              	.LVL100:
+ 786 0234 0B40     		ands	r3, r1
+ 787              	.LVL101:
+ 788 0236 C021     		movs	r1, #192
+ 789 0238 8901     		lsls	r1, r1, #6
+ 790 023a 4B40     		eors	r3, r1
+ 791              	.LVL102:
+ 792 023c 2349     		ldr	r1, .L62+36
+ 793 023e 0B43     		orrs	r3, r1
+ 794              	.LVL103:
+ 795 0240 1380     		strh	r3, [r2]
+ 796 0242 8DE7     		b	.L25
+ 797              	.LVL104:
+ 798              	.L20:
+ 799              	.LBE64:
+ 261:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 800              		.loc 1 261 0
+ 801 0244 C020     		movs	r0, #192
+ 802 0246 C000     		lsls	r0, r0, #3
+ 803 0248 0243     		orrs	r2, r0
+ 804              	.LVL105:
+ 244:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t wEpRegVal;
+ 805              		.loc 1 244 0
+ 806 024a 0020     		movs	r0, #0
+ 262:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 807              		.loc 1 262 0
+ 808 024c EDE6     		b	.L19
+ 809              	.L18:
+ 253:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 810              		.loc 1 253 0
+ 811 024e 8020     		movs	r0, #128
+ 812 0250 8000     		lsls	r0, r0, #2
+ 813 0252 0243     		orrs	r2, r0
+ 814              	.LVL106:
+ 244:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t wEpRegVal;
+ 815              		.loc 1 244 0
+ 816 0254 0020     		movs	r0, #0
+ 254:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 817              		.loc 1 254 0
+ 818 0256 E8E6     		b	.L19
+ 819              	.L17:
+ 265:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       break;
+ 820              		.loc 1 265 0
+ 821 0258 8020     		movs	r0, #128
+ 822 025a C000     		lsls	r0, r0, #3
+ 823 025c 0243     		orrs	r2, r0
+ 824              	.LVL107:
+ 244:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t wEpRegVal;
+ 825              		.loc 1 244 0
+ 826 025e 0020     		movs	r0, #0
+ 266:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 827              		.loc 1 266 0
+ 828 0260 E3E6     		b	.L19
+ARM GAS  /tmp/cclPFygS.s 			page 22
+
+
+ 829              	.LVL108:
+ 830              	.L61:
+ 831              	.LBB65:
+ 832              	.LBB60:
+ 301:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 833              		.loc 1 301 0 discriminator 1
+ 834 0262 1588     		ldrh	r5, [r2]
+ 835 0264 1B4C     		ldr	r4, .L62+44
+ 836 0266 2C40     		ands	r4, r5
+ 837 0268 1B4D     		ldr	r5, .L62+48
+ 838 026a 2C43     		orrs	r4, r5
+ 839 026c 1480     		strh	r4, [r2]
+ 840 026e D0E7     		b	.L27
+ 841              	.LVL109:
+ 842              	.L37:
+ 843              	.LBE60:
+ 844              	.LBE65:
+ 845              	.LBB66:
+ 342:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 846              		.loc 1 342 0
+ 847 0270 0A78     		ldrb	r2, [r1]
+ 848 0272 114C     		ldr	r4, .L62+16
+ 849 0274 9200     		lsls	r2, r2, #2
+ 850 0276 9A18     		adds	r2, r3, r2
+ 851 0278 1588     		ldrh	r5, [r2]
+ 852              	.LVL110:
+ 853 027a 2C40     		ands	r4, r5
+ 854 027c 134D     		ldr	r5, .L62+36
+ 855              	.LVL111:
+ 856 027e 2C43     		orrs	r4, r5
+ 857 0280 1480     		strh	r4, [r2]
+ 858 0282 9DE7     		b	.L38
+ 859              	.LVL112:
+ 860              	.L24:
+ 861              	.LBE66:
+ 862              	.LBB67:
+ 293:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 863              		.loc 1 293 0
+ 864 0284 0C4B     		ldr	r3, .L62+16
+ 865 0286 0B40     		ands	r3, r1
+ 866 0288 1049     		ldr	r1, .L62+36
+ 867              	.LVL113:
+ 868 028a 0B43     		orrs	r3, r1
+ 869 028c 1380     		strh	r3, [r2]
+ 870 028e 67E7     		b	.L25
+ 871              	.LVL114:
+ 872              	.L28:
+ 873              	.LBE67:
+ 874              	.LBB68:
+ 875              	.LBB61:
+ 301:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 876              		.loc 1 301 0 discriminator 4
+ 877 0290 1F26     		movs	r6, #31
+ 878 0292 6509     		lsrs	r5, r4, #5
+ 879              	.LVL115:
+ 880 0294 3440     		ands	r4, r6
+ 881 0296 6642     		rsbs	r6, r4, #0
+ARM GAS  /tmp/cclPFygS.s 			page 23
+
+
+ 882 0298 7441     		adcs	r4, r4, r6
+ 883 029a 2D1B     		subs	r5, r5, r4
+ 884              	.LVL116:
+ 885 029c 0E4C     		ldr	r4, .L62+48
+ 886 029e AD02     		lsls	r5, r5, #10
+ 887              	.LVL117:
+ 888 02a0 2543     		orrs	r5, r4
+ 889 02a2 1580     		strh	r5, [r2]
+ 890 02a4 B5E7     		b	.L27
+ 891              	.L63:
+ 892 02a6 C046     		.align	2
+ 893              	.L62:
+ 894 02a8 8F89FFFF 		.word	-30321
+ 895 02ac 8080FFFF 		.word	-32640
+ 896 02b0 8F8FFFFF 		.word	-28785
+ 897 02b4 C0800000 		.word	32960
+ 898 02b8 BF8FFFFF 		.word	-28737
+ 899 02bc 80810000 		.word	33152
+ 900 02c0 04040000 		.word	1028
+ 901 02c4 80C00000 		.word	49280
+ 902 02c8 8FBFFFFF 		.word	-16497
+ 903 02cc 80800000 		.word	32896
+ 904 02d0 06040000 		.word	1030
+ 905 02d4 FF83FFFF 		.word	-31745
+ 906 02d8 0080FFFF 		.word	-32768
+ 907              	.LBE61:
+ 908              	.LBE68:
+ 909              		.cfi_endproc
+ 910              	.LFE48:
+ 912              		.section	.text.USB_DeactivateEndpoint,"ax",%progbits
+ 913              		.align	2
+ 914              		.global	USB_DeactivateEndpoint
+ 915              		.code	16
+ 916              		.thumb_func
+ 918              	USB_DeactivateEndpoint:
+ 919              	.LFB49:
+ 351:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 352:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 353:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  De-activate and de-initialize an endpoint
+ 354:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 355:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  ep: pointer to endpoint structure
+ 356:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 357:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 358:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_DeactivateEndpoint(USB_TypeDef *USBx, USB_EPTypeDef *ep)
+ 359:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 920              		.loc 1 359 0
+ 921              		.cfi_startproc
+ 922              		@ args = 0, pretend = 0, frame = 0
+ 923              		@ frame_needed = 0, uses_anonymous_args = 0
+ 924              	.LVL118:
+ 925 0000 30B5     		push	{r4, r5, lr}
+ 926              	.LCFI3:
+ 927              		.cfi_def_cfa_offset 12
+ 928              		.cfi_offset 4, -12
+ 929              		.cfi_offset 5, -8
+ 930              		.cfi_offset 14, -4
+ 360:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->doublebuffer == 0U)
+ARM GAS  /tmp/cclPFygS.s 			page 24
+
+
+ 931              		.loc 1 360 0
+ 932 0002 0B7B     		ldrb	r3, [r1, #12]
+ 933 0004 002B     		cmp	r3, #0
+ 934 0006 19D1     		bne	.L65
+ 361:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 362:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->is_in != 0U)
+ 935              		.loc 1 362 0
+ 936 0008 4B78     		ldrb	r3, [r1, #1]
+ 937 000a 002B     		cmp	r3, #0
+ 938 000c 00D1     		bne	.LCB1024
+ 939 000e 7AE0     		b	.L66	@long jump
+ 940              	.LCB1024:
+ 941              	.LBB69:
+ 363:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 364:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 942              		.loc 1 364 0
+ 943 0010 0B78     		ldrb	r3, [r1]
+ 944 0012 9B00     		lsls	r3, r3, #2
+ 945 0014 C318     		adds	r3, r0, r3
+ 946 0016 1A88     		ldrh	r2, [r3]
+ 947              	.LVL119:
+ 948 0018 5206     		lsls	r2, r2, #25
+ 949 001a 08D5     		bpl	.L67
+ 950              	.LVL120:
+ 951              	.LBB70:
+ 952              		.loc 1 364 0 is_stmt 0 discriminator 1
+ 953 001c 1C88     		ldrh	r4, [r3]
+ 954              	.LVL121:
+ 955 001e 4A4A     		ldr	r2, .L94
+ 956 0020 2240     		ands	r2, r4
+ 957 0022 4A4C     		ldr	r4, .L94+4
+ 958              	.LVL122:
+ 959 0024 2243     		orrs	r2, r4
+ 960 0026 1A80     		strh	r2, [r3]
+ 961 0028 0B78     		ldrb	r3, [r1]
+ 962 002a 9B00     		lsls	r3, r3, #2
+ 963 002c C318     		adds	r3, r0, r3
+ 964              	.L67:
+ 965              	.LBE70:
+ 966              	.LBE69:
+ 967              	.LBB71:
+ 365:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure DISABLE status for the Endpoint*/
+ 366:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_DIS);
+ 968              		.loc 1 366 0 is_stmt 1
+ 969 002e 1988     		ldrh	r1, [r3]
+ 970              	.LVL123:
+ 971 0030 474A     		ldr	r2, .L94+8
+ 972 0032 0A40     		ands	r2, r1
+ 973 0034 4749     		ldr	r1, .L94+12
+ 974              	.LVL124:
+ 975 0036 0A43     		orrs	r2, r1
+ 976 0038 1A80     		strh	r2, [r3]
+ 977              	.LBE71:
+ 978 003a 62E0     		b	.L68
+ 979              	.LVL125:
+ 980              	.L65:
+ 367:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ARM GAS  /tmp/cclPFygS.s 			page 25
+
+
+ 368:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 369:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 370:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 371:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure DISABLE status for the Endpoint*/
+ 372:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_DIS);
+ 373:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 374:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 375:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /*Double Buffer*/
+ 376:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   else
+ 377:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 378:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->is_in == 0U)
+ 981              		.loc 1 378 0
+ 982 003c 4B78     		ldrb	r3, [r1, #1]
+ 983 003e 002B     		cmp	r3, #0
+ 984 0040 34D1     		bne	.L70
+ 985              	.LBB72:
+ 379:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 380:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Clear the data toggle bits for the endpoint IN/OUT*/
+ 381:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 986              		.loc 1 381 0
+ 987 0042 0B78     		ldrb	r3, [r1]
+ 988 0044 9B00     		lsls	r3, r3, #2
+ 989 0046 C318     		adds	r3, r0, r3
+ 990 0048 1A88     		ldrh	r2, [r3]
+ 991              	.LVL126:
+ 992 004a 5204     		lsls	r2, r2, #17
+ 993 004c 08D5     		bpl	.L71
+ 994              	.LVL127:
+ 995              	.LBB73:
+ 996              		.loc 1 381 0 is_stmt 0 discriminator 1
+ 997 004e 1C88     		ldrh	r4, [r3]
+ 998              	.LVL128:
+ 999 0050 3D4A     		ldr	r2, .L94
+ 1000 0052 2240     		ands	r2, r4
+ 1001 0054 404C     		ldr	r4, .L94+16
+ 1002              	.LVL129:
+ 1003 0056 2243     		orrs	r2, r4
+ 1004 0058 1A80     		strh	r2, [r3]
+ 1005 005a 0B78     		ldrb	r3, [r1]
+ 1006 005c 9B00     		lsls	r3, r3, #2
+ 1007 005e C318     		adds	r3, r0, r3
+ 1008              	.L71:
+ 1009              	.LBE73:
+ 1010              	.LBE72:
+ 1011              	.LBB74:
+ 382:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 1012              		.loc 1 382 0 is_stmt 1
+ 1013 0060 1A88     		ldrh	r2, [r3]
+ 1014              	.LVL130:
+ 1015 0062 5206     		lsls	r2, r2, #25
+ 1016 0064 08D5     		bpl	.L72
+ 1017              	.LVL131:
+ 1018              	.LBB75:
+ 1019              		.loc 1 382 0 is_stmt 0 discriminator 1
+ 1020 0066 1C88     		ldrh	r4, [r3]
+ 1021              	.LVL132:
+ 1022 0068 374A     		ldr	r2, .L94
+ARM GAS  /tmp/cclPFygS.s 			page 26
+
+
+ 1023 006a 2240     		ands	r2, r4
+ 1024 006c 374C     		ldr	r4, .L94+4
+ 1025              	.LVL133:
+ 1026 006e 2243     		orrs	r2, r4
+ 1027 0070 1A80     		strh	r2, [r3]
+ 1028 0072 0B78     		ldrb	r3, [r1]
+ 1029 0074 9B00     		lsls	r3, r3, #2
+ 1030 0076 C318     		adds	r3, r0, r3
+ 1031              	.L72:
+ 1032              	.LBE75:
+ 1033              	.LBE74:
+ 1034              	.LBB76:
+ 383:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 384:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Reset value of the data toggle bits for the endpoint out*/
+ 385:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_TX_DTOG(USBx, ep->num);
+ 1035              		.loc 1 385 0 is_stmt 1
+ 1036 0078 1C88     		ldrh	r4, [r3]
+ 1037              	.LVL134:
+ 1038 007a 334A     		ldr	r2, .L94
+ 1039              	.LBE76:
+ 1040              	.LBB77:
+ 386:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 387:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_DIS);
+ 1041              		.loc 1 387 0
+ 1042 007c 374D     		ldr	r5, .L94+20
+ 1043              	.LBE77:
+ 1044              	.LBB78:
+ 385:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1045              		.loc 1 385 0
+ 1046 007e 2240     		ands	r2, r4
+ 1047 0080 324C     		ldr	r4, .L94+4
+ 1048              	.LVL135:
+ 1049 0082 2243     		orrs	r2, r4
+ 1050 0084 1A80     		strh	r2, [r3]
+ 1051              	.LBE78:
+ 1052              	.LBB79:
+ 1053              		.loc 1 387 0
+ 1054 0086 0C78     		ldrb	r4, [r1]
+ 1055 0088 354B     		ldr	r3, .L94+24
+ 1056 008a A400     		lsls	r4, r4, #2
+ 1057 008c 0419     		adds	r4, r0, r4
+ 1058 008e 2288     		ldrh	r2, [r4]
+ 1059              	.LVL136:
+ 1060 0090 1A40     		ands	r2, r3
+ 1061              	.LVL137:
+ 1062 0092 2A43     		orrs	r2, r5
+ 1063 0094 92B2     		uxth	r2, r2
+ 1064 0096 2280     		strh	r2, [r4]
+ 1065              	.LBE79:
+ 1066              	.LBB80:
+ 388:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_DIS);
+ 1067              		.loc 1 388 0
+ 1068 0098 0A78     		ldrb	r2, [r1]
+ 1069 009a 9200     		lsls	r2, r2, #2
+ 1070 009c 8018     		adds	r0, r0, r2
+ 1071              	.LVL138:
+ 1072 009e 0388     		ldrh	r3, [r0]
+ARM GAS  /tmp/cclPFygS.s 			page 27
+
+
+ 1073              	.LVL139:
+ 1074 00a0 2B4A     		ldr	r2, .L94+8
+ 1075 00a2 1340     		ands	r3, r2
+ 1076              	.LVL140:
+ 1077 00a4 2B43     		orrs	r3, r5
+ 1078 00a6 9BB2     		uxth	r3, r3
+ 1079 00a8 0380     		strh	r3, [r0]
+ 1080              	.LBE80:
+ 1081 00aa 2AE0     		b	.L68
+ 1082              	.LVL141:
+ 1083              	.L70:
+ 1084              	.LBB81:
+ 389:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 390:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 391:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 392:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Clear the data toggle bits for the endpoint IN/OUT*/
+ 393:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 1085              		.loc 1 393 0
+ 1086 00ac 0B78     		ldrb	r3, [r1]
+ 1087 00ae 9B00     		lsls	r3, r3, #2
+ 1088 00b0 C418     		adds	r4, r0, r3
+ 1089 00b2 2388     		ldrh	r3, [r4]
+ 1090              	.LVL142:
+ 1091 00b4 5B04     		lsls	r3, r3, #17
+ 1092 00b6 08D5     		bpl	.L73
+ 1093              	.LVL143:
+ 1094              	.LBB82:
+ 1095              		.loc 1 393 0 is_stmt 0 discriminator 1
+ 1096 00b8 2288     		ldrh	r2, [r4]
+ 1097              	.LVL144:
+ 1098 00ba 234B     		ldr	r3, .L94
+ 1099 00bc 1340     		ands	r3, r2
+ 1100 00be 264A     		ldr	r2, .L94+16
+ 1101              	.LVL145:
+ 1102 00c0 1343     		orrs	r3, r2
+ 1103 00c2 2380     		strh	r3, [r4]
+ 1104 00c4 0B78     		ldrb	r3, [r1]
+ 1105 00c6 9B00     		lsls	r3, r3, #2
+ 1106 00c8 C418     		adds	r4, r0, r3
+ 1107              	.L73:
+ 1108              	.LBE82:
+ 1109              	.LBE81:
+ 1110              	.LBB83:
+ 394:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 1111              		.loc 1 394 0 is_stmt 1
+ 1112 00ca 2388     		ldrh	r3, [r4]
+ 1113              	.LVL146:
+ 1114 00cc 5B06     		lsls	r3, r3, #25
+ 1115 00ce 30D4     		bmi	.L93
+ 1116              	.LVL147:
+ 1117              	.L74:
+ 1118              	.LBE83:
+ 1119              	.LBB85:
+ 395:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_RX_DTOG(USBx, ep->num);
+ 1120              		.loc 1 395 0
+ 1121 00d0 2288     		ldrh	r2, [r4]
+ 1122              	.LVL148:
+ARM GAS  /tmp/cclPFygS.s 			page 28
+
+
+ 1123 00d2 1D4B     		ldr	r3, .L94
+ 1124              	.LBE85:
+ 1125              	.LBB86:
+ 396:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure DISABLE status for the Endpoint*/
+ 397:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_DIS);
+ 1126              		.loc 1 397 0
+ 1127 00d4 214D     		ldr	r5, .L94+20
+ 1128              	.LBE86:
+ 1129              	.LBB87:
+ 395:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_RX_DTOG(USBx, ep->num);
+ 1130              		.loc 1 395 0
+ 1131 00d6 1340     		ands	r3, r2
+ 1132 00d8 1F4A     		ldr	r2, .L94+16
+ 1133              	.LVL149:
+ 1134 00da 1343     		orrs	r3, r2
+ 1135 00dc 2380     		strh	r3, [r4]
+ 1136              	.LBE87:
+ 1137              	.LBB88:
+ 1138              		.loc 1 397 0
+ 1139 00de 0C78     		ldrb	r4, [r1]
+ 1140 00e0 1B4B     		ldr	r3, .L94+8
+ 1141 00e2 A400     		lsls	r4, r4, #2
+ 1142 00e4 0419     		adds	r4, r0, r4
+ 1143 00e6 2288     		ldrh	r2, [r4]
+ 1144              	.LVL150:
+ 1145 00e8 1A40     		ands	r2, r3
+ 1146              	.LVL151:
+ 1147 00ea 2A43     		orrs	r2, r5
+ 1148 00ec 92B2     		uxth	r2, r2
+ 1149 00ee 2280     		strh	r2, [r4]
+ 1150              	.LBE88:
+ 1151              	.LBB89:
+ 398:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_DIS);
+ 1152              		.loc 1 398 0
+ 1153 00f0 0A78     		ldrb	r2, [r1]
+ 1154 00f2 9200     		lsls	r2, r2, #2
+ 1155 00f4 8018     		adds	r0, r0, r2
+ 1156              	.LVL152:
+ 1157 00f6 0388     		ldrh	r3, [r0]
+ 1158              	.LVL153:
+ 1159 00f8 194A     		ldr	r2, .L94+24
+ 1160 00fa 1340     		ands	r3, r2
+ 1161              	.LVL154:
+ 1162 00fc 2B43     		orrs	r3, r5
+ 1163 00fe 9BB2     		uxth	r3, r3
+ 1164 0100 0380     		strh	r3, [r0]
+ 1165              	.LVL155:
+ 1166              	.L68:
+ 1167              	.LBE89:
+ 399:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 400:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 401:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 402:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 403:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 1168              		.loc 1 403 0
+ 1169 0102 0020     		movs	r0, #0
+ 1170              		@ sp needed
+ARM GAS  /tmp/cclPFygS.s 			page 29
+
+
+ 1171 0104 30BD     		pop	{r4, r5, pc}
+ 1172              	.LVL156:
+ 1173              	.L66:
+ 1174              	.LBB90:
+ 370:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure DISABLE status for the Endpoint*/
+ 1175              		.loc 1 370 0
+ 1176 0106 0B78     		ldrb	r3, [r1]
+ 1177 0108 9B00     		lsls	r3, r3, #2
+ 1178 010a C318     		adds	r3, r0, r3
+ 1179 010c 1A88     		ldrh	r2, [r3]
+ 1180              	.LVL157:
+ 1181 010e 5204     		lsls	r2, r2, #17
+ 1182 0110 08D5     		bpl	.L69
+ 1183              	.LVL158:
+ 1184              	.LBB91:
+ 370:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure DISABLE status for the Endpoint*/
+ 1185              		.loc 1 370 0 is_stmt 0 discriminator 1
+ 1186 0112 1C88     		ldrh	r4, [r3]
+ 1187              	.LVL159:
+ 1188 0114 0C4A     		ldr	r2, .L94
+ 1189 0116 2240     		ands	r2, r4
+ 1190 0118 0F4C     		ldr	r4, .L94+16
+ 1191              	.LVL160:
+ 1192 011a 2243     		orrs	r2, r4
+ 1193 011c 1A80     		strh	r2, [r3]
+ 1194 011e 0B78     		ldrb	r3, [r1]
+ 1195 0120 9B00     		lsls	r3, r3, #2
+ 1196 0122 C318     		adds	r3, r0, r3
+ 1197              	.L69:
+ 1198              	.LBE91:
+ 1199              	.LBE90:
+ 1200              	.LBB92:
+ 372:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1201              		.loc 1 372 0 is_stmt 1
+ 1202 0124 1988     		ldrh	r1, [r3]
+ 1203              	.LVL161:
+ 1204 0126 0E4A     		ldr	r2, .L94+24
+ 1205 0128 0A40     		ands	r2, r1
+ 1206 012a 0A49     		ldr	r1, .L94+12
+ 1207              	.LVL162:
+ 1208 012c 0A43     		orrs	r2, r1
+ 1209 012e 1A80     		strh	r2, [r3]
+ 1210 0130 E7E7     		b	.L68
+ 1211              	.LVL163:
+ 1212              	.L93:
+ 1213              	.LBE92:
+ 1214              	.LBB93:
+ 1215              	.LBB84:
+ 394:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_RX_DTOG(USBx, ep->num);
+ 1216              		.loc 1 394 0 discriminator 1
+ 1217 0132 2288     		ldrh	r2, [r4]
+ 1218              	.LVL164:
+ 1219 0134 044B     		ldr	r3, .L94
+ 1220 0136 1340     		ands	r3, r2
+ 1221 0138 044A     		ldr	r2, .L94+4
+ 1222              	.LVL165:
+ 1223 013a 1343     		orrs	r3, r2
+ARM GAS  /tmp/cclPFygS.s 			page 30
+
+
+ 1224 013c 2380     		strh	r3, [r4]
+ 1225 013e 0B78     		ldrb	r3, [r1]
+ 1226 0140 9B00     		lsls	r3, r3, #2
+ 1227 0142 C418     		adds	r4, r0, r3
+ 1228 0144 C4E7     		b	.L74
+ 1229              	.L95:
+ 1230 0146 C046     		.align	2
+ 1231              	.L94:
+ 1232 0148 8F8FFFFF 		.word	-28785
+ 1233 014c C0800000 		.word	32960
+ 1234 0150 BF8FFFFF 		.word	-28737
+ 1235 0154 80800000 		.word	32896
+ 1236 0158 80C00000 		.word	49280
+ 1237 015c 8080FFFF 		.word	-32640
+ 1238 0160 8FBFFFFF 		.word	-16497
+ 1239              	.LBE84:
+ 1240              	.LBE93:
+ 1241              		.cfi_endproc
+ 1242              	.LFE49:
+ 1244              		.section	.text.USB_EPStartXfer,"ax",%progbits
+ 1245              		.align	2
+ 1246              		.global	USB_EPStartXfer
+ 1247              		.code	16
+ 1248              		.thumb_func
+ 1250              	USB_EPStartXfer:
+ 1251              	.LFB50:
+ 404:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 405:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 406:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_EPStartXfer : setup and starts a transfer over an EP
+ 407:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 408:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  ep: pointer to endpoint structure
+ 409:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 410:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 411:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_EPStartXfer(USB_TypeDef *USBx, USB_EPTypeDef *ep)
+ 412:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 1252              		.loc 1 412 0
+ 1253              		.cfi_startproc
+ 1254              		@ args = 0, pretend = 0, frame = 0
+ 1255              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1256              	.LVL166:
+ 413:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t pmabuffer;
+ 414:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t len;
+ 415:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 416:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* IN endpoint */
+ 417:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->is_in == 1U)
+ 1257              		.loc 1 417 0
+ 1258 0000 4A78     		ldrb	r2, [r1, #1]
+ 412:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint16_t pmabuffer;
+ 1259              		.loc 1 412 0
+ 1260 0002 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1261              	.LCFI4:
+ 1262              		.cfi_def_cfa_offset 20
+ 1263              		.cfi_offset 4, -20
+ 1264              		.cfi_offset 5, -16
+ 1265              		.cfi_offset 6, -12
+ 1266              		.cfi_offset 7, -8
+ 1267              		.cfi_offset 14, -4
+ARM GAS  /tmp/cclPFygS.s 			page 31
+
+
+ 1268              		.loc 1 417 0
+ 1269 0004 012A     		cmp	r2, #1
+ 1270 0006 56D0     		beq	.L146
+ 418:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 419:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /*Multi packet transfer*/
+ 420:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->xfer_len > ep->maxpacket)
+ 421:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 422:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       len = ep->maxpacket;
+ 423:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       ep->xfer_len -= len;
+ 424:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 425:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 426:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 427:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       len = ep->xfer_len;
+ 428:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       ep->xfer_len = 0U;
+ 429:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 430:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 431:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* configure and validate Tx endpoint */
+ 432:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->doublebuffer == 0U)
+ 433:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 434:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       USB_WritePMA(USBx, ep->xfer_buff, ep->pmaadress, (uint16_t)len);
+ 435:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_TX_CNT(USBx, ep->num, len);
+ 436:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 437:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 438:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 439:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Write the data to the USB endpoint */
+ 440:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       if ((PCD_GET_ENDPOINT(USBx, ep->num) & USB_EP_DTOG_TX) != 0U)
+ 441:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 442:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Set the Double buffer counter for pmabuffer1 */
+ 443:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_DBUF1_CNT(USBx, ep->num, ep->is_in, len);
+ 444:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         pmabuffer = ep->pmaaddr1;
+ 445:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 446:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       else
+ 447:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 448:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Set the Double buffer counter for pmabuffer0 */
+ 449:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_DBUF0_CNT(USBx, ep->num, ep->is_in, len);
+ 450:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         pmabuffer = ep->pmaaddr0;
+ 451:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 452:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       USB_WritePMA(USBx, ep->xfer_buff, pmabuffer, (uint16_t)len);
+ 453:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_FreeUserBuffer(USBx, ep->num, ep->is_in);
+ 454:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 455:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 456:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_VALID);
+ 457:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 458:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   else /* OUT endpoint */
+ 459:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 460:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* Multi packet transfer*/
+ 461:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->xfer_len > ep->maxpacket)
+ 1271              		.loc 1 461 0
+ 1272 0008 8B69     		ldr	r3, [r1, #24]
+ 1273 000a 0C69     		ldr	r4, [r1, #16]
+ 1274 000c A342     		cmp	r3, r4
+ 1275 000e 27D8     		bhi	.L147
+ 1276              	.LVL167:
+ 462:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 463:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       len = ep->maxpacket;
+ 464:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       ep->xfer_len -= len;
+ 465:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ARM GAS  /tmp/cclPFygS.s 			page 32
+
+
+ 466:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 467:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 468:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       len = ep->xfer_len;
+ 469:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       ep->xfer_len = 0U;
+ 1277              		.loc 1 469 0
+ 1278 0010 0024     		movs	r4, #0
+ 1279 0012 8C61     		str	r4, [r1, #24]
+ 470:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 471:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 472:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* configure and validate Rx endpoint */
+ 473:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->doublebuffer == 0U)
+ 1280              		.loc 1 473 0
+ 1281 0014 0C7B     		ldrb	r4, [r1, #12]
+ 1282 0016 002C     		cmp	r4, #0
+ 1283 0018 28D1     		bne	.L115
+ 1284              	.L149:
+ 1285              	.LVL168:
+ 1286              	.LBB94:
+ 474:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 475:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /*Set RX buffer count*/
+ 476:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_CNT(USBx, ep->num, len);
+ 1287              		.loc 1 476 0
+ 1288 001a 5022     		movs	r2, #80
+ 1289 001c 8C4D     		ldr	r5, .L154
+ 1290 001e 845A     		ldrh	r4, [r0, r2]
+ 1291              	.LVL169:
+ 1292 0020 AC46     		mov	ip, r5
+ 1293 0022 0A78     		ldrb	r2, [r1]
+ 1294 0024 6444     		add	r4, r4, ip
+ 1295              	.LVL170:
+ 1296 0026 D200     		lsls	r2, r2, #3
+ 1297 0028 1219     		adds	r2, r2, r4
+ 1298 002a 8218     		adds	r2, r0, r2
+ 1299              	.LVL171:
+ 1300              	.LBB95:
+ 1301 002c 002B     		cmp	r3, #0
+ 1302 002e 00D1     		bne	.LCB1446
+ 1303 0030 7AE0     		b	.L148	@long jump
+ 1304              	.LCB1446:
+ 1305              		.loc 1 476 0 is_stmt 0 discriminator 2
+ 1306 0032 3E2B     		cmp	r3, #62
+ 1307 0034 00D9     		bls	.LCB1448
+ 1308 0036 D4E0     		b	.L118	@long jump
+ 1309              	.LCB1448:
+ 1310              		.loc 1 476 0 discriminator 3
+ 1311 0038 0125     		movs	r5, #1
+ 1312 003a 5C08     		lsrs	r4, r3, #1
+ 1313              	.LVL172:
+ 1314 003c 2B40     		ands	r3, r5
+ 1315              	.LVL173:
+ 1316 003e E418     		adds	r4, r4, r3
+ 1317              	.LVL174:
+ 1318 0040 A402     		lsls	r4, r4, #10
+ 1319              	.LVL175:
+ 1320 0042 1480     		strh	r4, [r2]
+ 1321              	.LVL176:
+ 1322              	.L117:
+ARM GAS  /tmp/cclPFygS.s 			page 33
+
+
+ 1323              	.LBE95:
+ 1324              	.LBE94:
+ 1325              	.LBB98:
+ 477:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 478:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 479:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 480:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /*Set the Double buffer counter*/
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_DBUF_CNT(USBx, ep->num, ep->is_in, len);
+ 482:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 483:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 484:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_VALID);
+ 1326              		.loc 1 484 0 is_stmt 1
+ 1327 0044 0B78     		ldrb	r3, [r1]
+ 1328 0046 9B00     		lsls	r3, r3, #2
+ 1329 0048 C018     		adds	r0, r0, r3
+ 1330              	.LVL177:
+ 1331 004a 0288     		ldrh	r2, [r0]
+ 1332 004c 814B     		ldr	r3, .L154+4
+ 1333 004e 1340     		ands	r3, r2
+ 1334              	.LVL178:
+ 1335 0050 C022     		movs	r2, #192
+ 1336 0052 9201     		lsls	r2, r2, #6
+ 1337 0054 5340     		eors	r3, r2
+ 1338              	.LVL179:
+ 1339 0056 804A     		ldr	r2, .L154+8
+ 1340 0058 1343     		orrs	r3, r2
+ 1341              	.LVL180:
+ 1342 005a 0380     		strh	r3, [r0]
+ 1343              	.L144:
+ 1344              	.LBE98:
+ 485:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 486:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 487:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 488:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 1345              		.loc 1 488 0
+ 1346 005c 0020     		movs	r0, #0
+ 1347              		@ sp needed
+ 1348 005e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1349              	.LVL181:
+ 1350              	.L147:
+ 464:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1351              		.loc 1 464 0
+ 1352 0060 1B1B     		subs	r3, r3, r4
+ 1353 0062 8B61     		str	r3, [r1, #24]
+ 1354 0064 2300     		movs	r3, r4
+ 473:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 1355              		.loc 1 473 0
+ 1356 0066 0C7B     		ldrb	r4, [r1, #12]
+ 1357              	.LVL182:
+ 1358 0068 002C     		cmp	r4, #0
+ 1359 006a D6D0     		beq	.L149
+ 1360              	.L115:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1361              		.loc 1 481 0
+ 1362 006c 002A     		cmp	r2, #0
+ 1363 006e E9D1     		bne	.L117
+ 1364              	.LVL183:
+ARM GAS  /tmp/cclPFygS.s 			page 34
+
+
+ 1365              	.LBB99:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1366              		.loc 1 481 0 is_stmt 0 discriminator 1
+ 1367 0070 5025     		movs	r5, #80
+ 1368 0072 7A4E     		ldr	r6, .L154+12
+ 1369 0074 445B     		ldrh	r4, [r0, r5]
+ 1370              	.LVL184:
+ 1371 0076 B446     		mov	ip, r6
+ 1372 0078 0A78     		ldrb	r2, [r1]
+ 1373 007a 6444     		add	r4, r4, ip
+ 1374              	.LVL185:
+ 1375 007c D200     		lsls	r2, r2, #3
+ 1376 007e 1219     		adds	r2, r2, r4
+ 1377 0080 1218     		adds	r2, r2, r0
+ 1378              	.LVL186:
+ 1379              	.LBB100:
+ 1380 0082 002B     		cmp	r3, #0
+ 1381 0084 00D0     		beq	.LCB1543
+ 1382 0086 8FE0     		b	.L122	@long jump
+ 1383              	.LCB1543:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1384              		.loc 1 481 0 discriminator 3
+ 1385 0088 1688     		ldrh	r6, [r2]
+ 1386 008a 754C     		ldr	r4, .L154+16
+ 1387              	.LVL187:
+ 1388 008c 754F     		ldr	r7, .L154+20
+ 1389 008e 2640     		ands	r6, r4
+ 1390 0090 3E43     		orrs	r6, r7
+ 1391 0092 1680     		strh	r6, [r2]
+ 1392              	.LVL188:
+ 1393              	.LBE100:
+ 1394              	.LBE99:
+ 1395              	.LBB103:
+ 1396 0094 4A78     		ldrb	r2, [r1, #1]
+ 1397              	.LVL189:
+ 1398 0096 002A     		cmp	r2, #0
+ 1399 0098 00D0     		beq	.LCB1558
+ 1400 009a 94E0     		b	.L124	@long jump
+ 1401              	.LCB1558:
+ 1402              	.LVL190:
+ 1403              	.LBB104:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1404              		.loc 1 481 0
+ 1405 009c 425B     		ldrh	r2, [r0, r5]
+ 1406              	.LVL191:
+ 1407 009e 6C4D     		ldr	r5, .L154
+ 1408 00a0 0B78     		ldrb	r3, [r1]
+ 1409              	.LVL192:
+ 1410 00a2 AC46     		mov	ip, r5
+ 1411 00a4 DB00     		lsls	r3, r3, #3
+ 1412 00a6 6244     		add	r2, r2, ip
+ 1413              	.LVL193:
+ 1414 00a8 9B18     		adds	r3, r3, r2
+ 1415 00aa 1B18     		adds	r3, r3, r0
+ 1416              	.LVL194:
+ 1417              	.LBB105:
+ 1418 00ac 1A88     		ldrh	r2, [r3]
+ARM GAS  /tmp/cclPFygS.s 			page 35
+
+
+ 1419              	.LVL195:
+ 1420 00ae 1440     		ands	r4, r2
+ 1421 00b0 3C43     		orrs	r4, r7
+ 1422 00b2 1C80     		strh	r4, [r3]
+ 1423 00b4 C6E7     		b	.L117
+ 1424              	.LVL196:
+ 1425              	.L146:
+ 1426              	.LBE105:
+ 1427              	.LBE104:
+ 1428              	.LBE103:
+ 420:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 1429              		.loc 1 420 0 is_stmt 1
+ 1430 00b6 8A69     		ldr	r2, [r1, #24]
+ 1431 00b8 0B69     		ldr	r3, [r1, #16]
+ 1432 00ba 9A42     		cmp	r2, r3
+ 1433 00bc 3BD8     		bhi	.L150
+ 1434              	.LVL197:
+ 428:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1435              		.loc 1 428 0
+ 1436 00be 0023     		movs	r3, #0
+ 1437 00c0 8B61     		str	r3, [r1, #24]
+ 432:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 1438              		.loc 1 432 0
+ 1439 00c2 0B7B     		ldrb	r3, [r1, #12]
+ 1440 00c4 002B     		cmp	r3, #0
+ 1441 00c6 3CD1     		bne	.L100
+ 1442              	.L151:
+ 1443              	.LVL198:
+ 1444              	.LBB108:
+ 1445              	.LBB109:
+ 489:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 490:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 491:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_WritePacket : Writes a packet into the Tx FIFO associated
+ 492:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         with the EP/channel
+ 493:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 494:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  src :  pointer to source buffer
+ 495:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  ch_ep_num : endpoint or host channel number
+ 496:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  len : Number of bytes to write
+ 497:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 498:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 499:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_WritePacket(USB_TypeDef *USBx, uint8_t *src, uint8_t ch_ep_num, uint16_t len)
+ 500:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 501:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 502:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 503:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(src);
+ 504:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(ch_ep_num);
+ 505:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(len);
+ 506:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 507:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 508:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 509:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 510:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 511:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 512:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 513:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 514:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_ReadPacket : read a packet from the Tx FIFO associated
+ 515:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *         with the EP/channel
+ARM GAS  /tmp/cclPFygS.s 			page 36
+
+
+ 516:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 517:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  dest : destination pointer
+ 518:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  len : Number of bytes to read
+ 519:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval pointer to destination buffer
+ 520:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 521:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** void *USB_ReadPacket(USB_TypeDef *USBx, uint8_t *dest, uint16_t len)
+ 522:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 523:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 524:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 525:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(dest);
+ 526:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(len);
+ 527:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 528:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 529:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 530:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 531:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return ((void *)NULL);
+ 532:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 533:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 534:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 535:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_EPSetStall : set a stall condition over an EP
+ 536:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 537:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  ep: pointer to endpoint structure
+ 538:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 539:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 540:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_EPSetStall(USB_TypeDef *USBx, USB_EPTypeDef *ep)
+ 541:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 542:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->is_in != 0U)
+ 543:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 544:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_STALL);
+ 545:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 546:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   else
+ 547:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 548:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_STALL);
+ 549:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 550:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 551:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 552:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 553:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 554:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 555:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_EPClearStall : Clear a stall condition over an EP
+ 556:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 557:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  ep: pointer to endpoint structure
+ 558:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 559:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 560:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_EPClearStall(USB_TypeDef *USBx, USB_EPTypeDef *ep)
+ 561:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 562:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->doublebuffer == 0U)
+ 563:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 564:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     if (ep->is_in != 0U)
+ 565:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 566:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_TX_DTOG(USBx, ep->num);
+ 567:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 568:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       if (ep->type != EP_TYPE_ISOC)
+ 569:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 570:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         /* Configure NAK status for the Endpoint */
+ 571:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         PCD_SET_EP_TX_STATUS(USBx, ep->num, USB_EP_TX_NAK);
+ 572:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ARM GAS  /tmp/cclPFygS.s 			page 37
+
+
+ 573:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 574:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     else
+ 575:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 576:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_CLEAR_RX_DTOG(USBx, ep->num);
+ 577:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 578:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       /* Configure VALID status for the Endpoint*/
+ 579:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       PCD_SET_EP_RX_STATUS(USBx, ep->num, USB_EP_RX_VALID);
+ 580:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 581:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 582:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 583:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 584:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 585:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 586:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 587:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_StopDevice : Stop the usb device mode
+ 588:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 589:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 590:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 591:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_StopDevice(USB_TypeDef *USBx)
+ 592:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 593:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* disable all interrupts and force USB reset */
+ 594:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR = USB_CNTR_FRES;
+ 595:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 596:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* clear interrupt status register */
+ 597:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->ISTR = 0;
+ 598:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 599:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* switch-off device */
+ 600:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR = (USB_CNTR_FRES | USB_CNTR_PDWN);
+ 601:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 602:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 603:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 604:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 605:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 606:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_SetDevAddress : Stop the usb device mode
+ 607:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 608:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  address : new device address to be assigned
+ 609:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *          This parameter can be a value from 0 to 255
+ 610:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 611:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 612:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef  USB_SetDevAddress(USB_TypeDef *USBx, uint8_t address)
+ 613:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 614:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (address == 0U)
+ 615:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 616:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     /* set device address and enable function */
+ 617:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     USBx->DADDR = USB_DADDR_EF;
+ 618:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 619:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 620:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 621:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 622:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 623:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 624:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_DevConnect : Connect the USB device by enabling the pull-up/pull-down
+ 625:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 626:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 627:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 628:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef  USB_DevConnect(USB_TypeDef *USBx)
+ 629:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ARM GAS  /tmp/cclPFygS.s 			page 38
+
+
+ 630:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Enabling DP Pull-UP bit to Connect internal PU resistor on USB DP line */
+ 631:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->BCDR |= USB_BCDR_DPPU;
+ 632:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 633:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 634:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 635:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 636:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 637:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_DevDisconnect : Disconnect the USB device by disabling the pull-up/pull-down
+ 638:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 639:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 640:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 641:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef  USB_DevDisconnect(USB_TypeDef *USBx)
+ 642:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 643:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Disable DP Pull-Up bit to disconnect the Internal PU resistor on USB DP line */
+ 644:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->BCDR &= (uint16_t)(~(USB_BCDR_DPPU));
+ 645:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 646:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 647:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 648:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 649:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 650:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_ReadInterrupts: return the global USB interrupt status
+ 651:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 652:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 653:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 654:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** uint32_t  USB_ReadInterrupts(USB_TypeDef *USBx)
+ 655:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 656:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t tmpreg;
+ 657:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 658:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   tmpreg = USBx->ISTR;
+ 659:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return tmpreg;
+ 660:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 661:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 662:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 663:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_ReadDevAllOutEpInterrupt: return the USB device OUT endpoints interrupt status
+ 664:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 665:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 666:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 667:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** uint32_t USB_ReadDevAllOutEpInterrupt(USB_TypeDef *USBx)
+ 668:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 669:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 670:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 671:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 672:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 673:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 674:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 675:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return (0);
+ 676:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 677:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 678:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 679:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_ReadDevAllInEpInterrupt: return the USB device IN endpoints interrupt status
+ 680:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 681:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 682:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 683:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** uint32_t USB_ReadDevAllInEpInterrupt(USB_TypeDef *USBx)
+ 684:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 685:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 686:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ARM GAS  /tmp/cclPFygS.s 			page 39
+
+
+ 687:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 688:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 689:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 690:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 691:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return (0);
+ 692:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 693:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 694:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 695:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  Returns Device OUT EP Interrupt register
+ 696:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 697:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  epnum : endpoint number
+ 698:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *          This parameter can be a value from 0 to 15
+ 699:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval Device OUT EP Interrupt register
+ 700:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 701:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** uint32_t USB_ReadDevOutEPInterrupt(USB_TypeDef *USBx, uint8_t epnum)
+ 702:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 703:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 704:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 705:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(epnum);
+ 706:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 707:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 708:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 709:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 710:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return (0);
+ 711:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 712:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 713:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 714:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  Returns Device IN EP Interrupt register
+ 715:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx : Selected device
+ 716:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  epnum : endpoint number
+ 717:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   *          This parameter can be a value from 0 to 15
+ 718:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval Device IN EP Interrupt register
+ 719:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 720:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** uint32_t USB_ReadDevInEPInterrupt(USB_TypeDef *USBx, uint8_t epnum)
+ 721:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 722:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 723:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 724:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(epnum);
+ 725:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 726:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 727:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 728:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 729:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return (0);
+ 730:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 731:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 732:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 733:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_ClearInterrupts: clear a USB interrupt
+ 734:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx  Selected device
+ 735:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  interrupt  interrupt flag
+ 736:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval None
+ 737:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 738:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** void  USB_ClearInterrupts(USB_TypeDef *USBx, uint32_t interrupt)
+ 739:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 740:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 741:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 742:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(interrupt);
+ 743:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ARM GAS  /tmp/cclPFygS.s 			page 40
+
+
+ 744:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 745:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 746:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 747:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 748:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 749:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 750:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  Prepare the EP0 to start the first control setup
+ 751:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx  Selected device
+ 752:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  psetup  pointer to setup packet
+ 753:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 754:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 755:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_EP0_OutStart(USB_TypeDef *USBx, uint8_t *psetup)
+ 756:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 757:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 758:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(USBx);
+ 759:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   UNUSED(psetup);
+ 760:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* NOTE : - This function is not required by USB Device FS peripheral, it is used
+ 761:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****               only by USB OTG FS peripheral.
+ 762:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****             - This function is added to ensure compatibility across platforms.
+ 763:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****    */
+ 764:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 765:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 766:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 767:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 768:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_ActivateRemoteWakeup : active remote wakeup signalling
+ 769:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx  Selected device
+ 770:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 771:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 772:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_ActivateRemoteWakeup(USB_TypeDef *USBx)
+ 773:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 774:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR |= USB_CNTR_RESUME;
+ 775:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 776:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 777:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 778:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 779:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 780:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief  USB_DeActivateRemoteWakeup : de-active remote wakeup signalling
+ 781:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param  USBx  Selected device
+ 782:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval HAL status
+ 783:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 784:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** HAL_StatusTypeDef USB_DeActivateRemoteWakeup(USB_TypeDef *USBx)
+ 785:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 786:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR &= ~(USB_CNTR_RESUME);
+ 787:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 788:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 789:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 790:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 791:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief Copy a buffer from user memory area to packet memory area (PMA)
+ 792:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   USBx USB peripheral instance register address.
+ 793:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   pbUsrBuf pointer to user memory area.
+ 794:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   wPMABufAddr address into PMA.
+ 795:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   wNBytes: no. of bytes to be copied.
+ 796:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval None
+ 797:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 798:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** void USB_WritePMA(USB_TypeDef *USBx, uint8_t *pbUsrBuf, uint16_t wPMABufAddr, uint16_t wNBytes)
+ 799:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t n = ((uint32_t)wNBytes + 1U) >> 1;
+ARM GAS  /tmp/cclPFygS.s 			page 41
+
+
+ 801:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 802:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t i, temp1, temp2;
+ 803:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   __IO uint16_t *pdwVal;
+ 804:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint8_t *pBuf = pbUsrBuf;
+ 805:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 806:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((uint32_t)wPMABufAddr * PMA_ACCESS));
+ 1446              		.loc 1 806 0
+ 1447 00c8 8023     		movs	r3, #128
+ 1448 00ca DB00     		lsls	r3, r3, #3
+ 1449 00cc 9C46     		mov	ip, r3
+ 1450 00ce CC88     		ldrh	r4, [r1, #6]
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 1451              		.loc 1 800 0
+ 1452 00d0 1604     		lsls	r6, r2, #16
+ 1453              		.loc 1 806 0
+ 1454 00d2 6444     		add	r4, r4, ip
+ 807:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   for (i = n; i != 0U; i--)
+ 1455              		.loc 1 808 0
+ 1456 00d4 4B69     		ldr	r3, [r1, #20]
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 1457              		.loc 1 800 0
+ 1458 00d6 360C     		lsrs	r6, r6, #16
+ 806:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1459              		.loc 1 806 0
+ 1460 00d8 2418     		adds	r4, r4, r0
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 1461              		.loc 1 800 0
+ 1462 00da 0136     		adds	r6, r6, #1
+ 1463 00dc E41A     		subs	r4, r4, r3
+ 1464 00de 7608     		lsrs	r6, r6, #1
+ 1465              	.LVL199:
+ 1466 00e0 A446     		mov	ip, r4
+ 1467              		.loc 1 808 0
+ 1468 00e2 0AD0     		beq	.L104
+ 1469              	.LVL200:
+ 1470              	.L139:
+ 1471 00e4 6446     		mov	r4, ip
+ 1472 00e6 1F19     		adds	r7, r3, r4
+ 1473              	.LVL201:
+ 1474 00e8 5C78     		ldrb	r4, [r3, #1]
+ 1475 00ea 1D78     		ldrb	r5, [r3]
+ 1476 00ec 2402     		lsls	r4, r4, #8
+ 1477 00ee 2C43     		orrs	r4, r5
+ 1478              	.LVL202:
+ 1479 00f0 013E     		subs	r6, r6, #1
+ 1480              	.LVL203:
+ 809:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 810:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     temp1 = *pBuf;
+ 811:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pBuf++;
+ 812:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     temp2 = temp1 | ((uint16_t)((uint16_t) *pBuf << 8));
+ 813:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     *pdwVal = (uint16_t)temp2;
+ 1481              		.loc 1 813 0
+ 1482 00f2 3C80     		strh	r4, [r7]
+ 1483              	.LVL204:
+ 1484 00f4 0233     		adds	r3, r3, #2
+ 1485              	.LVL205:
+ARM GAS  /tmp/cclPFygS.s 			page 42
+
+
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 1486              		.loc 1 808 0
+ 1487 00f6 002E     		cmp	r6, #0
+ 1488 00f8 F4D1     		bne	.L139
+ 1489              	.LVL206:
+ 1490              	.L104:
+ 1491              	.LBE109:
+ 1492              	.LBE108:
+ 1493              	.LBB110:
+ 435:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1494              		.loc 1 435 0
+ 1495 00fa 5023     		movs	r3, #80
+ 1496 00fc C45A     		ldrh	r4, [r0, r3]
+ 1497              	.LVL207:
+ 1498 00fe 0B78     		ldrb	r3, [r1]
+ 1499              	.LVL208:
+ 1500 0100 DB00     		lsls	r3, r3, #3
+ 1501              	.LVL209:
+ 1502 0102 1B19     		adds	r3, r3, r4
+ 1503 0104 554C     		ldr	r4, .L154+12
+ 1504              	.LVL210:
+ 1505 0106 C318     		adds	r3, r0, r3
+ 1506 0108 A446     		mov	ip, r4
+ 1507 010a 6344     		add	r3, r3, ip
+ 1508 010c 1A80     		strh	r2, [r3]
+ 1509              	.LVL211:
+ 1510              	.L102:
+ 1511              	.LBE110:
+ 1512              	.LBB111:
+ 456:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 1513              		.loc 1 456 0
+ 1514 010e 0B78     		ldrb	r3, [r1]
+ 1515 0110 9B00     		lsls	r3, r3, #2
+ 1516 0112 C018     		adds	r0, r0, r3
+ 1517              	.LVL212:
+ 1518 0114 0288     		ldrh	r2, [r0]
+ 1519 0116 544B     		ldr	r3, .L154+24
+ 1520 0118 1340     		ands	r3, r2
+ 1521              	.LVL213:
+ 1522 011a 3022     		movs	r2, #48
+ 1523 011c 5340     		eors	r3, r2
+ 1524              	.LVL214:
+ 1525 011e 534A     		ldr	r2, .L154+28
+ 1526 0120 1343     		orrs	r3, r2
+ 1527 0122 9BB2     		uxth	r3, r3
+ 1528 0124 0380     		strh	r3, [r0]
+ 1529              	.LBE111:
+ 1530 0126 99E7     		b	.L144
+ 1531              	.LVL215:
+ 1532              	.L148:
+ 1533              	.LBB112:
+ 1534              	.LBB96:
+ 476:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1535              		.loc 1 476 0 discriminator 1
+ 1536 0128 1488     		ldrh	r4, [r2]
+ 1537              	.LVL216:
+ 1538 012a 4D4B     		ldr	r3, .L154+16
+ARM GAS  /tmp/cclPFygS.s 			page 43
+
+
+ 1539              	.LVL217:
+ 1540 012c 2340     		ands	r3, r4
+ 1541 012e 4D4C     		ldr	r4, .L154+20
+ 1542 0130 2343     		orrs	r3, r4
+ 1543 0132 1380     		strh	r3, [r2]
+ 1544 0134 86E7     		b	.L117
+ 1545              	.LVL218:
+ 1546              	.L150:
+ 1547              	.LBE96:
+ 1548              	.LBE112:
+ 423:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1549              		.loc 1 423 0
+ 1550 0136 D21A     		subs	r2, r2, r3
+ 1551 0138 8A61     		str	r2, [r1, #24]
+ 1552 013a 1A00     		movs	r2, r3
+ 432:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 1553              		.loc 1 432 0
+ 1554 013c 0B7B     		ldrb	r3, [r1, #12]
+ 1555              	.LVL219:
+ 1556 013e 002B     		cmp	r3, #0
+ 1557 0140 C2D0     		beq	.L151
+ 1558              	.L100:
+ 440:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 1559              		.loc 1 440 0
+ 1560 0142 0B78     		ldrb	r3, [r1]
+ 1561 0144 9C00     		lsls	r4, r3, #2
+ 1562 0146 0419     		adds	r4, r0, r4
+ 1563 0148 2488     		ldrh	r4, [r4]
+ 1564 014a 6406     		lsls	r4, r4, #25
+ 1565 014c 54D5     		bpl	.L105
+ 1566              	.LVL220:
+ 1567              	.LBB113:
+ 443:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         pmabuffer = ep->pmaaddr1;
+ 1568              		.loc 1 443 0
+ 1569 014e 5024     		movs	r4, #80
+ 1570 0150 DB00     		lsls	r3, r3, #3
+ 1571 0152 045B     		ldrh	r4, [r0, r4]
+ 1572              	.LVL221:
+ 1573 0154 C318     		adds	r3, r0, r3
+ 1574 0156 1B19     		adds	r3, r3, r4
+ 1575 0158 3D4C     		ldr	r4, .L154
+ 1576              	.LVL222:
+ 1577 015a A446     		mov	ip, r4
+ 1578 015c 6344     		add	r3, r3, ip
+ 1579 015e 1A80     		strh	r2, [r3]
+ 1580              	.LBE113:
+ 444:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 1581              		.loc 1 444 0
+ 1582 0160 4B89     		ldrh	r3, [r1, #10]
+ 1583              	.LVL223:
+ 1584              	.L106:
+ 1585              	.LBB114:
+ 1586              	.LBB115:
+ 806:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1587              		.loc 1 806 0
+ 1588 0162 8024     		movs	r4, #128
+ 1589 0164 E400     		lsls	r4, r4, #3
+ARM GAS  /tmp/cclPFygS.s 			page 44
+
+
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 1590              		.loc 1 800 0
+ 1591 0166 1204     		lsls	r2, r2, #16
+ 1592              	.LVL224:
+ 806:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1593              		.loc 1 806 0
+ 1594 0168 0719     		adds	r7, r0, r4
+ 1595 016a FF18     		adds	r7, r7, r3
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 1596              		.loc 1 800 0
+ 1597 016c 120C     		lsrs	r2, r2, #16
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 1598              		.loc 1 808 0
+ 1599 016e 4B69     		ldr	r3, [r1, #20]
+ 1600              	.LVL225:
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 1601              		.loc 1 800 0
+ 1602 0170 0132     		adds	r2, r2, #1
+ 1603 0172 5208     		lsrs	r2, r2, #1
+ 1604              	.LVL226:
+ 1605 0174 FF1A     		subs	r7, r7, r3
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 1606              		.loc 1 808 0
+ 1607 0176 002A     		cmp	r2, #0
+ 1608 0178 09D0     		beq	.L111
+ 1609              	.LVL227:
+ 1610              	.L140:
+ 1611 017a 5C78     		ldrb	r4, [r3, #1]
+ 1612 017c 1D78     		ldrb	r5, [r3]
+ 1613 017e 2402     		lsls	r4, r4, #8
+ 1614 0180 DE19     		adds	r6, r3, r7
+ 1615              	.LVL228:
+ 1616 0182 2C43     		orrs	r4, r5
+ 1617              	.LVL229:
+ 1618 0184 013A     		subs	r2, r2, #1
+ 1619              	.LVL230:
+ 1620              		.loc 1 813 0
+ 1621 0186 3480     		strh	r4, [r6]
+ 1622              	.LVL231:
+ 1623 0188 0233     		adds	r3, r3, #2
+ 1624              	.LVL232:
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 1625              		.loc 1 808 0
+ 1626 018a 002A     		cmp	r2, #0
+ 1627 018c F5D1     		bne	.L140
+ 1628              	.LVL233:
+ 1629              	.L111:
+ 1630              	.LBE115:
+ 1631              	.LBE114:
+ 453:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1632              		.loc 1 453 0
+ 1633 018e 4B78     		ldrb	r3, [r1, #1]
+ 1634 0190 002B     		cmp	r3, #0
+ 1635 0192 3CD1     		bne	.L152
+ 1636              	.LBB116:
+ 453:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1637              		.loc 1 453 0 is_stmt 0 discriminator 1
+ARM GAS  /tmp/cclPFygS.s 			page 45
+
+
+ 1638 0194 0B78     		ldrb	r3, [r1]
+ 1639 0196 364A     		ldr	r2, .L154+32
+ 1640 0198 9B00     		lsls	r3, r3, #2
+ 1641 019a C318     		adds	r3, r0, r3
+ 1642 019c 1C88     		ldrh	r4, [r3]
+ 1643              	.LVL234:
+ 1644 019e 2240     		ands	r2, r4
+ 1645 01a0 344C     		ldr	r4, .L154+36
+ 1646              	.LVL235:
+ 1647 01a2 2243     		orrs	r2, r4
+ 1648 01a4 1A80     		strh	r2, [r3]
+ 1649              	.LBE116:
+ 1650 01a6 B2E7     		b	.L102
+ 1651              	.LVL236:
+ 1652              	.L122:
+ 1653              	.LBB117:
+ 1654              	.LBB101:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1655              		.loc 1 481 0 is_stmt 1 discriminator 4
+ 1656 01a8 3E2B     		cmp	r3, #62
+ 1657 01aa 3DD9     		bls	.L153
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1658              		.loc 1 481 0 is_stmt 0 discriminator 6
+ 1659 01ac 1F26     		movs	r6, #31
+ 1660 01ae 1E40     		ands	r6, r3
+ 1661 01b0 7742     		rsbs	r7, r6, #0
+ 1662 01b2 7E41     		adcs	r6, r6, r7
+ 1663 01b4 5C09     		lsrs	r4, r3, #5
+ 1664              	.LVL237:
+ 1665 01b6 A41B     		subs	r4, r4, r6
+ 1666              	.LVL238:
+ 1667 01b8 2A4E     		ldr	r6, .L154+20
+ 1668 01ba A402     		lsls	r4, r4, #10
+ 1669 01bc 3443     		orrs	r4, r6
+ 1670 01be 1480     		strh	r4, [r2]
+ 1671              	.LVL239:
+ 1672              	.LBE101:
+ 1673              	.LBE117:
+ 1674              	.LBB118:
+ 1675 01c0 4A78     		ldrb	r2, [r1, #1]
+ 1676              	.LVL240:
+ 1677 01c2 002A     		cmp	r2, #0
+ 1678 01c4 3AD0     		beq	.L127
+ 1679              	.L124:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1680              		.loc 1 481 0 discriminator 17
+ 1681 01c6 012A     		cmp	r2, #1
+ 1682 01c8 00D0     		beq	.LCB1950
+ 1683 01ca 3BE7     		b	.L117	@long jump
+ 1684              	.LCB1950:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1685              		.loc 1 481 0 discriminator 28
+ 1686 01cc 4F32     		adds	r2, r2, #79
+ 1687 01ce 845A     		ldrh	r4, [r0, r2]
+ 1688              	.LVL241:
+ 1689 01d0 0A78     		ldrb	r2, [r1]
+ 1690              	.LVL242:
+ARM GAS  /tmp/cclPFygS.s 			page 46
+
+
+ 1691 01d2 D200     		lsls	r2, r2, #3
+ 1692              	.LVL243:
+ 1693 01d4 8218     		adds	r2, r0, r2
+ 1694 01d6 1219     		adds	r2, r2, r4
+ 1695 01d8 1D4C     		ldr	r4, .L154
+ 1696              	.LVL244:
+ 1697 01da A446     		mov	ip, r4
+ 1698 01dc 6244     		add	r2, r2, ip
+ 1699 01de 1380     		strh	r3, [r2]
+ 1700 01e0 30E7     		b	.L117
+ 1701              	.LVL245:
+ 1702              	.L118:
+ 1703              	.LBE118:
+ 1704              	.LBB119:
+ 1705              	.LBB97:
+ 476:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1706              		.loc 1 476 0 is_stmt 1 discriminator 4
+ 1707 01e2 1F25     		movs	r5, #31
+ 1708 01e4 5C09     		lsrs	r4, r3, #5
+ 1709              	.LVL246:
+ 1710 01e6 2B40     		ands	r3, r5
+ 1711              	.LVL247:
+ 1712 01e8 5D42     		rsbs	r5, r3, #0
+ 1713 01ea 6B41     		adcs	r3, r3, r5
+ 1714 01ec E41A     		subs	r4, r4, r3
+ 1715              	.LVL248:
+ 1716 01ee 1D4B     		ldr	r3, .L154+20
+ 1717 01f0 A402     		lsls	r4, r4, #10
+ 1718              	.LVL249:
+ 1719 01f2 1C43     		orrs	r4, r3
+ 1720 01f4 1480     		strh	r4, [r2]
+ 1721 01f6 25E7     		b	.L117
+ 1722              	.LVL250:
+ 1723              	.L105:
+ 1724              	.LBE97:
+ 1725              	.LBE119:
+ 1726              	.LBB120:
+ 449:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****         pmabuffer = ep->pmaaddr0;
+ 1727              		.loc 1 449 0 discriminator 13
+ 1728 01f8 5024     		movs	r4, #80
+ 1729 01fa DB00     		lsls	r3, r3, #3
+ 1730 01fc 045B     		ldrh	r4, [r0, r4]
+ 1731              	.LVL251:
+ 1732 01fe C318     		adds	r3, r0, r3
+ 1733 0200 1B19     		adds	r3, r3, r4
+ 1734 0202 164C     		ldr	r4, .L154+12
+ 1735              	.LVL252:
+ 1736 0204 A446     		mov	ip, r4
+ 1737 0206 6344     		add	r3, r3, ip
+ 1738 0208 1A80     		strh	r2, [r3]
+ 1739              	.LBE120:
+ 450:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 1740              		.loc 1 450 0 discriminator 13
+ 1741 020a 0B89     		ldrh	r3, [r1, #8]
+ 1742              	.LVL253:
+ 1743 020c A9E7     		b	.L106
+ 1744              	.LVL254:
+ARM GAS  /tmp/cclPFygS.s 			page 47
+
+
+ 1745              	.L152:
+ 453:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1746              		.loc 1 453 0 discriminator 2
+ 1747 020e 012B     		cmp	r3, #1
+ 1748 0210 00D0     		beq	.LCB2040
+ 1749 0212 7CE7     		b	.L102	@long jump
+ 1750              	.LCB2040:
+ 1751              	.LBB121:
+ 453:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1752              		.loc 1 453 0 is_stmt 0 discriminator 3
+ 1753 0214 0B78     		ldrb	r3, [r1]
+ 1754 0216 164A     		ldr	r2, .L154+32
+ 1755 0218 9B00     		lsls	r3, r3, #2
+ 1756 021a C318     		adds	r3, r0, r3
+ 1757 021c 1C88     		ldrh	r4, [r3]
+ 1758              	.LVL255:
+ 1759 021e 2240     		ands	r2, r4
+ 1760 0220 154C     		ldr	r4, .L154+40
+ 1761              	.LVL256:
+ 1762 0222 2243     		orrs	r2, r4
+ 1763 0224 1A80     		strh	r2, [r3]
+ 1764 0226 72E7     		b	.L102
+ 1765              	.LVL257:
+ 1766              	.L153:
+ 1767              	.LBE121:
+ 1768              	.LBB122:
+ 1769              	.LBB102:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1770              		.loc 1 481 0 is_stmt 1 discriminator 5
+ 1771 0228 0124     		movs	r4, #1
+ 1772              	.LVL258:
+ 1773 022a 1C40     		ands	r4, r3
+ 1774 022c 2600     		movs	r6, r4
+ 1775 022e 5F08     		lsrs	r7, r3, #1
+ 1776 0230 BC19     		adds	r4, r7, r6
+ 1777 0232 A402     		lsls	r4, r4, #10
+ 1778 0234 1480     		strh	r4, [r2]
+ 1779              	.LVL259:
+ 1780              	.LBE102:
+ 1781              	.LBE122:
+ 1782              	.LBB123:
+ 1783 0236 4A78     		ldrb	r2, [r1, #1]
+ 1784              	.LVL260:
+ 1785 0238 002A     		cmp	r2, #0
+ 1786 023a C4D1     		bne	.L124
+ 1787              	.L127:
+ 1788              	.LVL261:
+ 1789              	.LBB107:
+ 481:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 1790              		.loc 1 481 0 is_stmt 0
+ 1791 023c 425B     		ldrh	r2, [r0, r5]
+ 1792              	.LVL262:
+ 1793 023e 044D     		ldr	r5, .L154
+ 1794 0240 0B78     		ldrb	r3, [r1]
+ 1795              	.LVL263:
+ 1796 0242 AC46     		mov	ip, r5
+ 1797 0244 DB00     		lsls	r3, r3, #3
+ARM GAS  /tmp/cclPFygS.s 			page 48
+
+
+ 1798 0246 6244     		add	r2, r2, ip
+ 1799              	.LVL264:
+ 1800 0248 9B18     		adds	r3, r3, r2
+ 1801              	.LVL265:
+ 1802              	.LBB106:
+ 1803 024a C452     		strh	r4, [r0, r3]
+ 1804 024c FAE6     		b	.L117
+ 1805              	.L155:
+ 1806 024e C046     		.align	2
+ 1807              	.L154:
+ 1808 0250 06040000 		.word	1030
+ 1809 0254 8FBFFFFF 		.word	-16497
+ 1810 0258 80800000 		.word	32896
+ 1811 025c 02040000 		.word	1026
+ 1812 0260 FF83FFFF 		.word	-31745
+ 1813 0264 0080FFFF 		.word	-32768
+ 1814 0268 BF8FFFFF 		.word	-28737
+ 1815 026c 8080FFFF 		.word	-32640
+ 1816 0270 8F8FFFFF 		.word	-28785
+ 1817 0274 C0800000 		.word	32960
+ 1818 0278 80C00000 		.word	49280
+ 1819              	.LBE106:
+ 1820              	.LBE107:
+ 1821              	.LBE123:
+ 1822              		.cfi_endproc
+ 1823              	.LFE50:
+ 1825              		.section	.text.USB_WritePacket,"ax",%progbits
+ 1826              		.align	2
+ 1827              		.global	USB_WritePacket
+ 1828              		.code	16
+ 1829              		.thumb_func
+ 1831              	USB_WritePacket:
+ 1832              	.LFB51:
+ 500:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 1833              		.loc 1 500 0 is_stmt 1
+ 1834              		.cfi_startproc
+ 1835              		@ args = 0, pretend = 0, frame = 0
+ 1836              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1837              		@ link register save eliminated.
+ 1838              	.LVL266:
+ 511:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1839              		.loc 1 511 0
+ 1840 0000 0020     		movs	r0, #0
+ 1841              	.LVL267:
+ 1842              		@ sp needed
+ 1843 0002 7047     		bx	lr
+ 1844              		.cfi_endproc
+ 1845              	.LFE51:
+ 1847              		.section	.text.USB_ReadPacket,"ax",%progbits
+ 1848              		.align	2
+ 1849              		.global	USB_ReadPacket
+ 1850              		.code	16
+ 1851              		.thumb_func
+ 1853              	USB_ReadPacket:
+ 1854              	.LFB52:
+ 522:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 1855              		.loc 1 522 0
+ARM GAS  /tmp/cclPFygS.s 			page 49
+
+
+ 1856              		.cfi_startproc
+ 1857              		@ args = 0, pretend = 0, frame = 0
+ 1858              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1859              		@ link register save eliminated.
+ 1860              	.LVL268:
+ 532:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1861              		.loc 1 532 0
+ 1862 0000 0020     		movs	r0, #0
+ 1863              	.LVL269:
+ 1864              		@ sp needed
+ 1865 0002 7047     		bx	lr
+ 1866              		.cfi_endproc
+ 1867              	.LFE52:
+ 1869              		.section	.text.USB_EPSetStall,"ax",%progbits
+ 1870              		.align	2
+ 1871              		.global	USB_EPSetStall
+ 1872              		.code	16
+ 1873              		.thumb_func
+ 1875              	USB_EPSetStall:
+ 1876              	.LFB53:
+ 541:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->is_in != 0U)
+ 1877              		.loc 1 541 0
+ 1878              		.cfi_startproc
+ 1879              		@ args = 0, pretend = 0, frame = 0
+ 1880              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1881              		@ link register save eliminated.
+ 1882              	.LVL270:
+ 542:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 1883              		.loc 1 542 0
+ 1884 0000 4B78     		ldrb	r3, [r1, #1]
+ 1885 0002 002B     		cmp	r3, #0
+ 1886 0004 0DD1     		bne	.L161
+ 1887              	.LBB124:
+ 548:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 1888              		.loc 1 548 0
+ 1889 0006 0B78     		ldrb	r3, [r1]
+ 1890 0008 9B00     		lsls	r3, r3, #2
+ 1891 000a C018     		adds	r0, r0, r3
+ 1892              	.LVL271:
+ 1893 000c 0288     		ldrh	r2, [r0]
+ 1894 000e 0B4B     		ldr	r3, .L162
+ 1895 0010 1340     		ands	r3, r2
+ 1896              	.LVL272:
+ 1897 0012 8022     		movs	r2, #128
+ 1898 0014 5201     		lsls	r2, r2, #5
+ 1899 0016 5340     		eors	r3, r2
+ 1900              	.LVL273:
+ 1901 0018 094A     		ldr	r2, .L162+4
+ 1902 001a 1343     		orrs	r3, r2
+ 1903              	.LVL274:
+ 1904 001c 0380     		strh	r3, [r0]
+ 1905              	.L160:
+ 1906              	.LBE124:
+ 552:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1907              		.loc 1 552 0
+ 1908 001e 0020     		movs	r0, #0
+ 1909              		@ sp needed
+ARM GAS  /tmp/cclPFygS.s 			page 50
+
+
+ 1910 0020 7047     		bx	lr
+ 1911              	.LVL275:
+ 1912              	.L161:
+ 1913              	.LBB125:
+ 544:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 1914              		.loc 1 544 0
+ 1915 0022 0B78     		ldrb	r3, [r1]
+ 1916 0024 9B00     		lsls	r3, r3, #2
+ 1917 0026 C018     		adds	r0, r0, r3
+ 1918              	.LVL276:
+ 1919 0028 0288     		ldrh	r2, [r0]
+ 1920 002a 064B     		ldr	r3, .L162+8
+ 1921 002c 1340     		ands	r3, r2
+ 1922              	.LVL277:
+ 1923 002e 1022     		movs	r2, #16
+ 1924 0030 5340     		eors	r3, r2
+ 1925              	.LVL278:
+ 1926 0032 054A     		ldr	r2, .L162+12
+ 1927 0034 1343     		orrs	r3, r2
+ 1928 0036 9BB2     		uxth	r3, r3
+ 1929 0038 0380     		strh	r3, [r0]
+ 1930              	.LBE125:
+ 1931 003a F0E7     		b	.L160
+ 1932              	.L163:
+ 1933              		.align	2
+ 1934              	.L162:
+ 1935 003c 8FBFFFFF 		.word	-16497
+ 1936 0040 80800000 		.word	32896
+ 1937 0044 BF8FFFFF 		.word	-28737
+ 1938 0048 8080FFFF 		.word	-32640
+ 1939              		.cfi_endproc
+ 1940              	.LFE53:
+ 1942              		.section	.text.USB_EPClearStall,"ax",%progbits
+ 1943              		.align	2
+ 1944              		.global	USB_EPClearStall
+ 1945              		.code	16
+ 1946              		.thumb_func
+ 1948              	USB_EPClearStall:
+ 1949              	.LFB54:
+ 561:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (ep->doublebuffer == 0U)
+ 1950              		.loc 1 561 0
+ 1951              		.cfi_startproc
+ 1952              		@ args = 0, pretend = 0, frame = 0
+ 1953              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1954              	.LVL279:
+ 1955 0000 10B5     		push	{r4, lr}
+ 1956              	.LCFI5:
+ 1957              		.cfi_def_cfa_offset 8
+ 1958              		.cfi_offset 4, -8
+ 1959              		.cfi_offset 14, -4
+ 562:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 1960              		.loc 1 562 0
+ 1961 0002 0B7B     		ldrb	r3, [r1, #12]
+ 1962 0004 002B     		cmp	r3, #0
+ 1963 0006 17D1     		bne	.L166
+ 564:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     {
+ 1964              		.loc 1 564 0
+ARM GAS  /tmp/cclPFygS.s 			page 51
+
+
+ 1965 0008 4B78     		ldrb	r3, [r1, #1]
+ 1966 000a 002B     		cmp	r3, #0
+ 1967 000c 16D0     		beq	.L167
+ 1968              	.LBB126:
+ 566:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 1969              		.loc 1 566 0
+ 1970 000e 0B78     		ldrb	r3, [r1]
+ 1971 0010 9B00     		lsls	r3, r3, #2
+ 1972 0012 C318     		adds	r3, r0, r3
+ 1973 0014 1A88     		ldrh	r2, [r3]
+ 1974              	.LVL280:
+ 1975 0016 5206     		lsls	r2, r2, #25
+ 1976 0018 29D4     		bmi	.L180
+ 1977              	.LVL281:
+ 1978              	.L168:
+ 1979              	.LBE126:
+ 568:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       {
+ 1980              		.loc 1 568 0
+ 1981 001a CB78     		ldrb	r3, [r1, #3]
+ 1982 001c 012B     		cmp	r3, #1
+ 1983 001e 0BD0     		beq	.L166
+ 1984              	.LBB128:
+ 571:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****       }
+ 1985              		.loc 1 571 0
+ 1986 0020 0B78     		ldrb	r3, [r1]
+ 1987 0022 9B00     		lsls	r3, r3, #2
+ 1988 0024 C018     		adds	r0, r0, r3
+ 1989              	.LVL282:
+ 1990 0026 0288     		ldrh	r2, [r0]
+ 1991 0028 144B     		ldr	r3, .L181
+ 1992 002a 1340     		ands	r3, r2
+ 1993              	.LVL283:
+ 1994 002c 2022     		movs	r2, #32
+ 1995 002e 5340     		eors	r3, r2
+ 1996              	.LVL284:
+ 1997 0030 134A     		ldr	r2, .L181+4
+ 1998 0032 1343     		orrs	r3, r2
+ 1999 0034 9BB2     		uxth	r3, r3
+ 2000 0036 0380     		strh	r3, [r0]
+ 2001              	.LVL285:
+ 2002              	.L166:
+ 2003              	.LBE128:
+ 584:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2004              		.loc 1 584 0
+ 2005 0038 0020     		movs	r0, #0
+ 2006              		@ sp needed
+ 2007 003a 10BD     		pop	{r4, pc}
+ 2008              	.LVL286:
+ 2009              	.L167:
+ 2010              	.LBB129:
+ 576:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2011              		.loc 1 576 0
+ 2012 003c 0B78     		ldrb	r3, [r1]
+ 2013 003e 9B00     		lsls	r3, r3, #2
+ 2014 0040 C318     		adds	r3, r0, r3
+ 2015 0042 1A88     		ldrh	r2, [r3]
+ 2016              	.LVL287:
+ARM GAS  /tmp/cclPFygS.s 			page 52
+
+
+ 2017 0044 5204     		lsls	r2, r2, #17
+ 2018 0046 08D5     		bpl	.L170
+ 2019              	.LVL288:
+ 2020              	.LBB130:
+ 576:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2021              		.loc 1 576 0 is_stmt 0 discriminator 1
+ 2022 0048 1C88     		ldrh	r4, [r3]
+ 2023              	.LVL289:
+ 2024 004a 0E4A     		ldr	r2, .L181+8
+ 2025 004c 2240     		ands	r2, r4
+ 2026 004e 0E4C     		ldr	r4, .L181+12
+ 2027              	.LVL290:
+ 2028 0050 2243     		orrs	r2, r4
+ 2029 0052 1A80     		strh	r2, [r3]
+ 2030 0054 0B78     		ldrb	r3, [r1]
+ 2031 0056 9B00     		lsls	r3, r3, #2
+ 2032 0058 C318     		adds	r3, r0, r3
+ 2033              	.L170:
+ 2034              	.LBE130:
+ 2035              	.LBE129:
+ 2036              	.LBB131:
+ 579:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     }
+ 2037              		.loc 1 579 0 is_stmt 1
+ 2038 005a 1988     		ldrh	r1, [r3]
+ 2039              	.LVL291:
+ 2040 005c 0B4A     		ldr	r2, .L181+16
+ 2041 005e 0A40     		ands	r2, r1
+ 2042              	.LVL292:
+ 2043 0060 C021     		movs	r1, #192
+ 2044 0062 8901     		lsls	r1, r1, #6
+ 2045 0064 4A40     		eors	r2, r1
+ 2046              	.LVL293:
+ 2047 0066 0A49     		ldr	r1, .L181+20
+ 2048 0068 0A43     		orrs	r2, r1
+ 2049              	.LVL294:
+ 2050 006a 1A80     		strh	r2, [r3]
+ 2051 006c E4E7     		b	.L166
+ 2052              	.LVL295:
+ 2053              	.L180:
+ 2054              	.LBE131:
+ 2055              	.LBB132:
+ 2056              	.LBB127:
+ 566:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2057              		.loc 1 566 0 discriminator 1
+ 2058 006e 1C88     		ldrh	r4, [r3]
+ 2059              	.LVL296:
+ 2060 0070 044A     		ldr	r2, .L181+8
+ 2061 0072 2240     		ands	r2, r4
+ 2062 0074 074C     		ldr	r4, .L181+24
+ 2063              	.LVL297:
+ 2064 0076 2243     		orrs	r2, r4
+ 2065 0078 1A80     		strh	r2, [r3]
+ 2066 007a CEE7     		b	.L168
+ 2067              	.L182:
+ 2068              		.align	2
+ 2069              	.L181:
+ 2070 007c BF8FFFFF 		.word	-28737
+ARM GAS  /tmp/cclPFygS.s 			page 53
+
+
+ 2071 0080 8080FFFF 		.word	-32640
+ 2072 0084 8F8FFFFF 		.word	-28785
+ 2073 0088 80C00000 		.word	49280
+ 2074 008c 8FBFFFFF 		.word	-16497
+ 2075 0090 80800000 		.word	32896
+ 2076 0094 C0800000 		.word	32960
+ 2077              	.LBE127:
+ 2078              	.LBE132:
+ 2079              		.cfi_endproc
+ 2080              	.LFE54:
+ 2082              		.section	.text.USB_StopDevice,"ax",%progbits
+ 2083              		.align	2
+ 2084              		.global	USB_StopDevice
+ 2085              		.code	16
+ 2086              		.thumb_func
+ 2088              	USB_StopDevice:
+ 2089              	.LFB55:
+ 592:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* disable all interrupts and force USB reset */
+ 2090              		.loc 1 592 0
+ 2091              		.cfi_startproc
+ 2092              		@ args = 0, pretend = 0, frame = 0
+ 2093              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2094              		@ link register save eliminated.
+ 2095              	.LVL298:
+ 594:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2096              		.loc 1 594 0
+ 2097 0000 4023     		movs	r3, #64
+ 2098 0002 0122     		movs	r2, #1
+ 597:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2099              		.loc 1 597 0
+ 2100 0004 0021     		movs	r1, #0
+ 594:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2101              		.loc 1 594 0
+ 2102 0006 C252     		strh	r2, [r0, r3]
+ 597:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2103              		.loc 1 597 0
+ 2104 0008 4332     		adds	r2, r2, #67
+ 2105 000a 8152     		strh	r1, [r0, r2]
+ 600:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2106              		.loc 1 600 0
+ 2107 000c 413A     		subs	r2, r2, #65
+ 2108 000e C252     		strh	r2, [r0, r3]
+ 603:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2109              		.loc 1 603 0
+ 2110              		@ sp needed
+ 2111 0010 0020     		movs	r0, #0
+ 2112              	.LVL299:
+ 2113 0012 7047     		bx	lr
+ 2114              		.cfi_endproc
+ 2115              	.LFE55:
+ 2117              		.section	.text.USB_SetDevAddress,"ax",%progbits
+ 2118              		.align	2
+ 2119              		.global	USB_SetDevAddress
+ 2120              		.code	16
+ 2121              		.thumb_func
+ 2123              	USB_SetDevAddress:
+ 2124              	.LFB56:
+ARM GAS  /tmp/cclPFygS.s 			page 54
+
+
+ 613:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if (address == 0U)
+ 2125              		.loc 1 613 0
+ 2126              		.cfi_startproc
+ 2127              		@ args = 0, pretend = 0, frame = 0
+ 2128              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2129              		@ link register save eliminated.
+ 2130              	.LVL300:
+ 614:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 2131              		.loc 1 614 0
+ 2132 0000 0029     		cmp	r1, #0
+ 2133 0002 02D1     		bne	.L185
+ 617:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 2134              		.loc 1 617 0
+ 2135 0004 8022     		movs	r2, #128
+ 2136 0006 4C23     		movs	r3, #76
+ 2137 0008 C252     		strh	r2, [r0, r3]
+ 2138              	.L185:
+ 621:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2139              		.loc 1 621 0
+ 2140 000a 0020     		movs	r0, #0
+ 2141              	.LVL301:
+ 2142              		@ sp needed
+ 2143 000c 7047     		bx	lr
+ 2144              		.cfi_endproc
+ 2145              	.LFE56:
+ 2147 000e C046     		.section	.text.USB_DevConnect,"ax",%progbits
+ 2148              		.align	2
+ 2149              		.global	USB_DevConnect
+ 2150              		.code	16
+ 2151              		.thumb_func
+ 2153              	USB_DevConnect:
+ 2154              	.LFB57:
+ 629:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Enabling DP Pull-UP bit to Connect internal PU resistor on USB DP line */
+ 2155              		.loc 1 629 0
+ 2156              		.cfi_startproc
+ 2157              		@ args = 0, pretend = 0, frame = 0
+ 2158              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2159              		@ link register save eliminated.
+ 2160              	.LVL302:
+ 631:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2161              		.loc 1 631 0
+ 2162 0000 5822     		movs	r2, #88
+ 2163 0002 8023     		movs	r3, #128
+ 2164 0004 815A     		ldrh	r1, [r0, r2]
+ 2165 0006 1B02     		lsls	r3, r3, #8
+ 2166 0008 0B43     		orrs	r3, r1
+ 2167 000a 8352     		strh	r3, [r0, r2]
+ 634:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2168              		.loc 1 634 0
+ 2169              		@ sp needed
+ 2170 000c 0020     		movs	r0, #0
+ 2171              	.LVL303:
+ 2172 000e 7047     		bx	lr
+ 2173              		.cfi_endproc
+ 2174              	.LFE57:
+ 2176              		.section	.text.USB_DevDisconnect,"ax",%progbits
+ 2177              		.align	2
+ARM GAS  /tmp/cclPFygS.s 			page 55
+
+
+ 2178              		.global	USB_DevDisconnect
+ 2179              		.code	16
+ 2180              		.thumb_func
+ 2182              	USB_DevDisconnect:
+ 2183              	.LFB58:
+ 642:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Disable DP Pull-Up bit to disconnect the Internal PU resistor on USB DP line */
+ 2184              		.loc 1 642 0
+ 2185              		.cfi_startproc
+ 2186              		@ args = 0, pretend = 0, frame = 0
+ 2187              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2188              		@ link register save eliminated.
+ 2189              	.LVL304:
+ 644:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2190              		.loc 1 644 0
+ 2191 0000 5822     		movs	r2, #88
+ 2192 0002 835A     		ldrh	r3, [r0, r2]
+ 647:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2193              		.loc 1 647 0
+ 2194              		@ sp needed
+ 644:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2195              		.loc 1 644 0
+ 2196 0004 5B04     		lsls	r3, r3, #17
+ 2197 0006 5B0C     		lsrs	r3, r3, #17
+ 2198 0008 8352     		strh	r3, [r0, r2]
+ 647:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2199              		.loc 1 647 0
+ 2200 000a 0020     		movs	r0, #0
+ 2201              	.LVL305:
+ 2202 000c 7047     		bx	lr
+ 2203              		.cfi_endproc
+ 2204              	.LFE58:
+ 2206 000e C046     		.section	.text.USB_ReadInterrupts,"ax",%progbits
+ 2207              		.align	2
+ 2208              		.global	USB_ReadInterrupts
+ 2209              		.code	16
+ 2210              		.thumb_func
+ 2212              	USB_ReadInterrupts:
+ 2213              	.LFB59:
+ 655:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t tmpreg;
+ 2214              		.loc 1 655 0
+ 2215              		.cfi_startproc
+ 2216              		@ args = 0, pretend = 0, frame = 0
+ 2217              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2218              		@ link register save eliminated.
+ 2219              	.LVL306:
+ 658:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return tmpreg;
+ 2220              		.loc 1 658 0
+ 2221 0000 4423     		movs	r3, #68
+ 2222 0002 C05A     		ldrh	r0, [r0, r3]
+ 2223              	.LVL307:
+ 660:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2224              		.loc 1 660 0
+ 2225              		@ sp needed
+ 658:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return tmpreg;
+ 2226              		.loc 1 658 0
+ 2227 0004 80B2     		uxth	r0, r0
+ 2228              	.LVL308:
+ARM GAS  /tmp/cclPFygS.s 			page 56
+
+
+ 660:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2229              		.loc 1 660 0
+ 2230 0006 7047     		bx	lr
+ 2231              		.cfi_endproc
+ 2232              	.LFE59:
+ 2234              		.section	.text.USB_ReadDevAllOutEpInterrupt,"ax",%progbits
+ 2235              		.align	2
+ 2236              		.global	USB_ReadDevAllOutEpInterrupt
+ 2237              		.code	16
+ 2238              		.thumb_func
+ 2240              	USB_ReadDevAllOutEpInterrupt:
+ 2241              	.LFB73:
+ 2242              		.cfi_startproc
+ 2243              		@ args = 0, pretend = 0, frame = 0
+ 2244              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2245              		@ link register save eliminated.
+ 2246 0000 0020     		movs	r0, #0
+ 2247              		@ sp needed
+ 2248 0002 7047     		bx	lr
+ 2249              		.cfi_endproc
+ 2250              	.LFE73:
+ 2252              		.section	.text.USB_ReadDevAllInEpInterrupt,"ax",%progbits
+ 2253              		.align	2
+ 2254              		.global	USB_ReadDevAllInEpInterrupt
+ 2255              		.code	16
+ 2256              		.thumb_func
+ 2258              	USB_ReadDevAllInEpInterrupt:
+ 2259              	.LFB61:
+ 684:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 2260              		.loc 1 684 0
+ 2261              		.cfi_startproc
+ 2262              		@ args = 0, pretend = 0, frame = 0
+ 2263              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2264              		@ link register save eliminated.
+ 2265              	.LVL309:
+ 692:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2266              		.loc 1 692 0
+ 2267 0000 0020     		movs	r0, #0
+ 2268              	.LVL310:
+ 2269              		@ sp needed
+ 2270 0002 7047     		bx	lr
+ 2271              		.cfi_endproc
+ 2272              	.LFE61:
+ 2274              		.section	.text.USB_ReadDevOutEPInterrupt,"ax",%progbits
+ 2275              		.align	2
+ 2276              		.global	USB_ReadDevOutEPInterrupt
+ 2277              		.code	16
+ 2278              		.thumb_func
+ 2280              	USB_ReadDevOutEPInterrupt:
+ 2281              	.LFB71:
+ 2282              		.cfi_startproc
+ 2283              		@ args = 0, pretend = 0, frame = 0
+ 2284              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2285              		@ link register save eliminated.
+ 2286 0000 0020     		movs	r0, #0
+ 2287              		@ sp needed
+ 2288 0002 7047     		bx	lr
+ARM GAS  /tmp/cclPFygS.s 			page 57
+
+
+ 2289              		.cfi_endproc
+ 2290              	.LFE71:
+ 2292              		.section	.text.USB_ReadDevInEPInterrupt,"ax",%progbits
+ 2293              		.align	2
+ 2294              		.global	USB_ReadDevInEPInterrupt
+ 2295              		.code	16
+ 2296              		.thumb_func
+ 2298              	USB_ReadDevInEPInterrupt:
+ 2299              	.LFB63:
+ 721:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 2300              		.loc 1 721 0
+ 2301              		.cfi_startproc
+ 2302              		@ args = 0, pretend = 0, frame = 0
+ 2303              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2304              		@ link register save eliminated.
+ 2305              	.LVL311:
+ 730:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2306              		.loc 1 730 0
+ 2307 0000 0020     		movs	r0, #0
+ 2308              	.LVL312:
+ 2309              		@ sp needed
+ 2310 0002 7047     		bx	lr
+ 2311              		.cfi_endproc
+ 2312              	.LFE63:
+ 2314              		.section	.text.USB_ClearInterrupts,"ax",%progbits
+ 2315              		.align	2
+ 2316              		.global	USB_ClearInterrupts
+ 2317              		.code	16
+ 2318              		.thumb_func
+ 2320              	USB_ClearInterrupts:
+ 2321              	.LFB64:
+ 739:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 2322              		.loc 1 739 0
+ 2323              		.cfi_startproc
+ 2324              		@ args = 0, pretend = 0, frame = 0
+ 2325              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2326              		@ link register save eliminated.
+ 2327              	.LVL313:
+ 747:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2328              		.loc 1 747 0
+ 2329              		@ sp needed
+ 2330 0000 7047     		bx	lr
+ 2331              		.cfi_endproc
+ 2332              	.LFE64:
+ 2334 0002 C046     		.section	.text.USB_EP0_OutStart,"ax",%progbits
+ 2335              		.align	2
+ 2336              		.global	USB_EP0_OutStart
+ 2337              		.code	16
+ 2338              		.thumb_func
+ 2340              	USB_EP0_OutStart:
+ 2341              	.LFB65:
+ 756:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   /* Prevent unused argument(s) compilation warning */
+ 2342              		.loc 1 756 0
+ 2343              		.cfi_startproc
+ 2344              		@ args = 0, pretend = 0, frame = 0
+ 2345              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2346              		@ link register save eliminated.
+ARM GAS  /tmp/cclPFygS.s 			page 58
+
+
+ 2347              	.LVL314:
+ 765:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2348              		.loc 1 765 0
+ 2349 0000 0020     		movs	r0, #0
+ 2350              	.LVL315:
+ 2351              		@ sp needed
+ 2352 0002 7047     		bx	lr
+ 2353              		.cfi_endproc
+ 2354              	.LFE65:
+ 2356              		.section	.text.USB_ActivateRemoteWakeup,"ax",%progbits
+ 2357              		.align	2
+ 2358              		.global	USB_ActivateRemoteWakeup
+ 2359              		.code	16
+ 2360              		.thumb_func
+ 2362              	USB_ActivateRemoteWakeup:
+ 2363              	.LFB66:
+ 773:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR |= USB_CNTR_RESUME;
+ 2364              		.loc 1 773 0
+ 2365              		.cfi_startproc
+ 2366              		@ args = 0, pretend = 0, frame = 0
+ 2367              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2368              		@ link register save eliminated.
+ 2369              	.LVL316:
+ 774:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2370              		.loc 1 774 0
+ 2371 0000 4022     		movs	r2, #64
+ 2372 0002 1023     		movs	r3, #16
+ 2373 0004 815A     		ldrh	r1, [r0, r2]
+ 777:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2374              		.loc 1 777 0
+ 2375              		@ sp needed
+ 774:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2376              		.loc 1 774 0
+ 2377 0006 0B43     		orrs	r3, r1
+ 2378 0008 8352     		strh	r3, [r0, r2]
+ 777:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2379              		.loc 1 777 0
+ 2380 000a 0020     		movs	r0, #0
+ 2381              	.LVL317:
+ 2382 000c 7047     		bx	lr
+ 2383              		.cfi_endproc
+ 2384              	.LFE66:
+ 2386 000e C046     		.section	.text.USB_DeActivateRemoteWakeup,"ax",%progbits
+ 2387              		.align	2
+ 2388              		.global	USB_DeActivateRemoteWakeup
+ 2389              		.code	16
+ 2390              		.thumb_func
+ 2392              	USB_DeActivateRemoteWakeup:
+ 2393              	.LFB67:
+ 785:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   USBx->CNTR &= ~(USB_CNTR_RESUME);
+ 2394              		.loc 1 785 0
+ 2395              		.cfi_startproc
+ 2396              		@ args = 0, pretend = 0, frame = 0
+ 2397              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2398              		@ link register save eliminated.
+ 2399              	.LVL318:
+ 786:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ARM GAS  /tmp/cclPFygS.s 			page 59
+
+
+ 2400              		.loc 1 786 0
+ 2401 0000 4022     		movs	r2, #64
+ 2402 0002 1021     		movs	r1, #16
+ 2403 0004 835A     		ldrh	r3, [r0, r2]
+ 788:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2404              		.loc 1 788 0
+ 2405              		@ sp needed
+ 786:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   return HAL_OK;
+ 2406              		.loc 1 786 0
+ 2407 0006 8B43     		bics	r3, r1
+ 2408 0008 8352     		strh	r3, [r0, r2]
+ 788:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2409              		.loc 1 788 0
+ 2410 000a 0020     		movs	r0, #0
+ 2411              	.LVL319:
+ 2412 000c 7047     		bx	lr
+ 2413              		.cfi_endproc
+ 2414              	.LFE67:
+ 2416 000e C046     		.section	.text.USB_WritePMA,"ax",%progbits
+ 2417              		.align	2
+ 2418              		.global	USB_WritePMA
+ 2419              		.code	16
+ 2420              		.thumb_func
+ 2422              	USB_WritePMA:
+ 2423              	.LFB68:
+ 799:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t n = ((uint32_t)wNBytes + 1U) >> 1;
+ 2424              		.loc 1 799 0
+ 2425              		.cfi_startproc
+ 2426              		@ args = 0, pretend = 0, frame = 0
+ 2427              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2428              	.LVL320:
+ 2429 0000 30B5     		push	{r4, r5, lr}
+ 2430              	.LCFI6:
+ 2431              		.cfi_def_cfa_offset 12
+ 2432              		.cfi_offset 4, -12
+ 2433              		.cfi_offset 5, -8
+ 2434              		.cfi_offset 14, -4
+ 806:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2435              		.loc 1 806 0
+ 2436 0002 8024     		movs	r4, #128
+ 2437 0004 E400     		lsls	r4, r4, #3
+ 2438 0006 A446     		mov	ip, r4
+ 2439 0008 6244     		add	r2, r2, ip
+ 2440              	.LVL321:
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 2441              		.loc 1 800 0
+ 2442 000a 0133     		adds	r3, r3, #1
+ 2443              	.LVL322:
+ 806:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 2444              		.loc 1 806 0
+ 2445 000c 8018     		adds	r0, r0, r2
+ 2446              	.LVL323:
+ 800:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 2447              		.loc 1 800 0
+ 2448 000e 5B08     		lsrs	r3, r3, #1
+ 2449              	.LVL324:
+ 2450 0010 401A     		subs	r0, r0, r1
+ARM GAS  /tmp/cclPFygS.s 			page 60
+
+
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 2451              		.loc 1 808 0
+ 2452 0012 002B     		cmp	r3, #0
+ 2453 0014 09D0     		beq	.L197
+ 2454              	.LVL325:
+ 2455              	.L201:
+ 2456 0016 4A78     		ldrb	r2, [r1, #1]
+ 2457 0018 0C78     		ldrb	r4, [r1]
+ 2458 001a 1202     		lsls	r2, r2, #8
+ 2459 001c 0D18     		adds	r5, r1, r0
+ 2460              	.LVL326:
+ 2461 001e 2243     		orrs	r2, r4
+ 2462              	.LVL327:
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 2463              		.loc 1 808 0 is_stmt 0 discriminator 3
+ 2464 0020 013B     		subs	r3, r3, #1
+ 2465              	.LVL328:
+ 2466              		.loc 1 813 0 is_stmt 1 discriminator 3
+ 2467 0022 2A80     		strh	r2, [r5]
+ 2468              	.LVL329:
+ 2469 0024 0231     		adds	r1, r1, #2
+ 2470              	.LVL330:
+ 808:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 2471              		.loc 1 808 0 discriminator 3
+ 2472 0026 002B     		cmp	r3, #0
+ 2473 0028 F5D1     		bne	.L201
+ 2474              	.LVL331:
+ 2475              	.L197:
+ 814:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pdwVal++;
+ 815:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 816:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #if PMA_ACCESS > 1U
+ 817:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pdwVal++;
+ 818:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #endif
+ 819:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 820:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pBuf++;
+ 821:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 822:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 2476              		.loc 1 822 0
+ 2477              		@ sp needed
+ 2478 002a 30BD     		pop	{r4, r5, pc}
+ 2479              		.cfi_endproc
+ 2480              	.LFE68:
+ 2482              		.section	.text.USB_ReadPMA,"ax",%progbits
+ 2483              		.align	2
+ 2484              		.global	USB_ReadPMA
+ 2485              		.code	16
+ 2486              		.thumb_func
+ 2488              	USB_ReadPMA:
+ 2489              	.LFB69:
+ 823:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 824:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** /**
+ 825:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @brief Copy a buffer from user memory area to packet memory area (PMA)
+ 826:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   USBx: USB peripheral instance register address.
+ 827:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   pbUsrBuf pointer to user memory area.
+ 828:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   wPMABufAddr address into PMA.
+ 829:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @param   wNBytes: no. of bytes to be copied.
+ 830:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   * @retval None
+ARM GAS  /tmp/cclPFygS.s 			page 61
+
+
+ 831:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   */
+ 832:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** void USB_ReadPMA(USB_TypeDef *USBx, uint8_t *pbUsrBuf, uint16_t wPMABufAddr, uint16_t wNBytes)
+ 833:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** {
+ 2490              		.loc 1 833 0
+ 2491              		.cfi_startproc
+ 2492              		@ args = 0, pretend = 0, frame = 0
+ 2493              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2494              	.LVL332:
+ 2495 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 2496              	.LCFI7:
+ 2497              		.cfi_def_cfa_offset 20
+ 2498              		.cfi_offset 4, -20
+ 2499              		.cfi_offset 5, -16
+ 2500              		.cfi_offset 6, -12
+ 2501              		.cfi_offset 7, -8
+ 2502              		.cfi_offset 14, -4
+ 834:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t n = (uint32_t)wNBytes >> 1;
+ 835:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t BaseAddr = (uint32_t)USBx;
+ 836:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t i, temp;
+ 837:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   __IO uint16_t *pdwVal;
+ 838:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint8_t *pBuf = pbUsrBuf;
+ 839:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 840:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   pdwVal = (__IO uint16_t *)(BaseAddr + 0x400U + ((uint32_t)wPMABufAddr * PMA_ACCESS));
+ 2503              		.loc 1 840 0
+ 2504 0002 8024     		movs	r4, #128
+ 2505 0004 E400     		lsls	r4, r4, #3
+ 833:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t n = (uint32_t)wNBytes >> 1;
+ 2506              		.loc 1 833 0
+ 2507 0006 4746     		mov	r7, r8
+ 2508              		.loc 1 840 0
+ 2509 0008 A046     		mov	r8, r4
+ 2510 000a 4244     		add	r2, r2, r8
+ 2511              	.LVL333:
+ 2512 000c 8018     		adds	r0, r0, r2
+ 2513              	.LVL334:
+ 833:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t n = (uint32_t)wNBytes >> 1;
+ 2514              		.loc 1 833 0
+ 2515 000e 9C46     		mov	ip, r3
+ 2516 0010 80B4     		push	{r7}
+ 2517              	.LCFI8:
+ 2518              		.cfi_def_cfa_offset 24
+ 2519              		.cfi_offset 8, -24
+ 834:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   uint32_t n = (uint32_t)wNBytes >> 1;
+ 2520              		.loc 1 834 0
+ 2521 0012 5B08     		lsrs	r3, r3, #1
+ 2522              	.LVL335:
+ 2523              		.loc 1 840 0
+ 2524 0014 0200     		movs	r2, r0
+ 2525              	.LVL336:
+ 841:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 842:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   for (i = n; i != 0U; i--)
+ 2526              		.loc 1 842 0
+ 2527 0016 002B     		cmp	r3, #0
+ 2528 0018 0FD0     		beq	.L204
+ 2529              		.loc 1 842 0 is_stmt 0 discriminator 3
+ 2530 001a 0D00     		movs	r5, r1
+ 2531 001c 1E00     		movs	r6, r3
+ARM GAS  /tmp/cclPFygS.s 			page 62
+
+
+ 2532 001e 471A     		subs	r7, r0, r1
+ 2533              	.LVL337:
+ 2534              	.L205:
+ 2535 0020 EC19     		adds	r4, r5, r7
+ 2536              	.LVL338:
+ 843:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 844:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     temp = *(__IO uint16_t *)pdwVal;
+ 2537              		.loc 1 844 0 is_stmt 1 discriminator 3
+ 2538 0022 2488     		ldrh	r4, [r4]
+ 2539              	.LVL339:
+ 842:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 2540              		.loc 1 842 0 discriminator 3
+ 2541 0024 013E     		subs	r6, r6, #1
+ 2542              	.LVL340:
+ 2543              		.loc 1 844 0 discriminator 3
+ 2544 0026 A4B2     		uxth	r4, r4
+ 2545              	.LVL341:
+ 845:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pdwVal++;
+ 846:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     *pBuf = (uint8_t)((temp >> 0) & 0xFFU);
+ 2546              		.loc 1 846 0 discriminator 3
+ 2547 0028 2C70     		strb	r4, [r5]
+ 2548              	.LVL342:
+ 847:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pBuf++;
+ 848:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     *pBuf = (uint8_t)((temp >> 8) & 0xFFU);
+ 2549              		.loc 1 848 0 discriminator 3
+ 2550 002a 240A     		lsrs	r4, r4, #8
+ 2551              	.LVL343:
+ 2552 002c 6C70     		strb	r4, [r5, #1]
+ 2553 002e 0235     		adds	r5, r5, #2
+ 2554              	.LVL344:
+ 842:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 2555              		.loc 1 842 0 discriminator 3
+ 2556 0030 002E     		cmp	r6, #0
+ 2557 0032 F5D1     		bne	.L205
+ 2558 0034 5B00     		lsls	r3, r3, #1
+ 2559              	.LVL345:
+ 2560 0036 C218     		adds	r2, r0, r3
+ 2561 0038 C918     		adds	r1, r1, r3
+ 2562              	.LVL346:
+ 2563              	.L204:
+ 849:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pBuf++;
+ 850:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 851:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #if PMA_ACCESS > 1U
+ 852:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     pdwVal++;
+ 853:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** #endif
+ 854:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 855:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** 
+ 856:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   if ((wNBytes % 2U) != 0U)
+ 2564              		.loc 1 856 0
+ 2565 003a 6346     		mov	r3, ip
+ 2566 003c DB07     		lsls	r3, r3, #31
+ 2567 003e 01D5     		bpl	.L203
+ 857:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   {
+ 858:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     temp = *pdwVal;
+ 2568              		.loc 1 858 0
+ 2569 0040 1388     		ldrh	r3, [r2]
+ 2570              	.LVL347:
+ARM GAS  /tmp/cclPFygS.s 			page 63
+
+
+ 859:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****     *pBuf = (uint8_t)((temp >> 0) & 0xFFU);
+ 2571              		.loc 1 859 0
+ 2572 0042 0B70     		strb	r3, [r1]
+ 2573              	.LVL348:
+ 2574              	.L203:
+ 860:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c ****   }
+ 861:Drivers/STM32F0xx_HAL_Driver/Src/stm32f0xx_ll_usb.c **** }
+ 2575              		.loc 1 861 0
+ 2576              		@ sp needed
+ 2577 0044 04BC     		pop	{r2}
+ 2578 0046 9046     		mov	r8, r2
+ 2579 0048 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 2580              		.cfi_endproc
+ 2581              	.LFE69:
+ 2583 004a C046     		.text
+ 2584              	.Letext0:
+ 2585              		.file 2 "/opt/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/_default_types.h"
+ 2586              		.file 3 "/opt/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_stdint.h"
+ 2587              		.file 4 "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f042x6.h"
+ 2588              		.file 5 "Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h"
+ 2589              		.file 6 "Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_ll_usb.h"
+ARM GAS  /tmp/cclPFygS.s 			page 64
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 stm32f0xx_ll_usb.c
+     /tmp/cclPFygS.s:20     .text.USB_CoreInit:00000000 $t
+     /tmp/cclPFygS.s:25     .text.USB_CoreInit:00000000 USB_CoreInit
+     /tmp/cclPFygS.s:52     .text.USB_EnableGlobalInt:00000000 $t
+     /tmp/cclPFygS.s:57     .text.USB_EnableGlobalInt:00000000 USB_EnableGlobalInt
+     /tmp/cclPFygS.s:81     .text.USB_EnableGlobalInt:00000010 $d
+     /tmp/cclPFygS.s:86     .text.USB_DisableGlobalInt:00000000 $t
+     /tmp/cclPFygS.s:91     .text.USB_DisableGlobalInt:00000000 USB_DisableGlobalInt
+     /tmp/cclPFygS.s:115    .text.USB_DisableGlobalInt:00000010 $d
+     /tmp/cclPFygS.s:120    .text.USB_SetCurrentMode:00000000 $t
+     /tmp/cclPFygS.s:125    .text.USB_SetCurrentMode:00000000 USB_SetCurrentMode
+     /tmp/cclPFygS.s:138    .text.USB_DevInit:00000000 $t
+     /tmp/cclPFygS.s:143    .text.USB_DevInit:00000000 USB_DevInit
+     /tmp/cclPFygS.s:201    .text.USB_DevInit:00000028 $d
+     /tmp/cclPFygS.s:206    .text.USB_SetDevSpeed:00000000 $t
+     /tmp/cclPFygS.s:211    .text.USB_SetDevSpeed:00000000 USB_SetDevSpeed
+     /tmp/cclPFygS.s:228    .text.USB_FlushTxFifo:00000000 $t
+     /tmp/cclPFygS.s:233    .text.USB_FlushTxFifo:00000000 USB_FlushTxFifo
+     /tmp/cclPFygS.s:250    .text.USB_FlushRxFifo:00000000 $t
+     /tmp/cclPFygS.s:255    .text.USB_FlushRxFifo:00000000 USB_FlushRxFifo
+     /tmp/cclPFygS.s:272    .text.USB_ActivateEndpoint:00000000 $t
+     /tmp/cclPFygS.s:277    .text.USB_ActivateEndpoint:00000000 USB_ActivateEndpoint
+     /tmp/cclPFygS.s:894    .text.USB_ActivateEndpoint:000002a8 $d
+     /tmp/cclPFygS.s:913    .text.USB_DeactivateEndpoint:00000000 $t
+     /tmp/cclPFygS.s:918    .text.USB_DeactivateEndpoint:00000000 USB_DeactivateEndpoint
+     /tmp/cclPFygS.s:1232   .text.USB_DeactivateEndpoint:00000148 $d
+     /tmp/cclPFygS.s:1245   .text.USB_EPStartXfer:00000000 $t
+     /tmp/cclPFygS.s:1250   .text.USB_EPStartXfer:00000000 USB_EPStartXfer
+     /tmp/cclPFygS.s:1808   .text.USB_EPStartXfer:00000250 $d
+     /tmp/cclPFygS.s:1826   .text.USB_WritePacket:00000000 $t
+     /tmp/cclPFygS.s:1831   .text.USB_WritePacket:00000000 USB_WritePacket
+     /tmp/cclPFygS.s:1848   .text.USB_ReadPacket:00000000 $t
+     /tmp/cclPFygS.s:1853   .text.USB_ReadPacket:00000000 USB_ReadPacket
+     /tmp/cclPFygS.s:1870   .text.USB_EPSetStall:00000000 $t
+     /tmp/cclPFygS.s:1875   .text.USB_EPSetStall:00000000 USB_EPSetStall
+     /tmp/cclPFygS.s:1935   .text.USB_EPSetStall:0000003c $d
+     /tmp/cclPFygS.s:1943   .text.USB_EPClearStall:00000000 $t
+     /tmp/cclPFygS.s:1948   .text.USB_EPClearStall:00000000 USB_EPClearStall
+     /tmp/cclPFygS.s:2070   .text.USB_EPClearStall:0000007c $d
+     /tmp/cclPFygS.s:2083   .text.USB_StopDevice:00000000 $t
+     /tmp/cclPFygS.s:2088   .text.USB_StopDevice:00000000 USB_StopDevice
+     /tmp/cclPFygS.s:2118   .text.USB_SetDevAddress:00000000 $t
+     /tmp/cclPFygS.s:2123   .text.USB_SetDevAddress:00000000 USB_SetDevAddress
+     /tmp/cclPFygS.s:2148   .text.USB_DevConnect:00000000 $t
+     /tmp/cclPFygS.s:2153   .text.USB_DevConnect:00000000 USB_DevConnect
+     /tmp/cclPFygS.s:2177   .text.USB_DevDisconnect:00000000 $t
+     /tmp/cclPFygS.s:2182   .text.USB_DevDisconnect:00000000 USB_DevDisconnect
+     /tmp/cclPFygS.s:2207   .text.USB_ReadInterrupts:00000000 $t
+     /tmp/cclPFygS.s:2212   .text.USB_ReadInterrupts:00000000 USB_ReadInterrupts
+     /tmp/cclPFygS.s:2235   .text.USB_ReadDevAllOutEpInterrupt:00000000 $t
+     /tmp/cclPFygS.s:2240   .text.USB_ReadDevAllOutEpInterrupt:00000000 USB_ReadDevAllOutEpInterrupt
+     /tmp/cclPFygS.s:2253   .text.USB_ReadDevAllInEpInterrupt:00000000 $t
+     /tmp/cclPFygS.s:2258   .text.USB_ReadDevAllInEpInterrupt:00000000 USB_ReadDevAllInEpInterrupt
+     /tmp/cclPFygS.s:2275   .text.USB_ReadDevOutEPInterrupt:00000000 $t
+     /tmp/cclPFygS.s:2280   .text.USB_ReadDevOutEPInterrupt:00000000 USB_ReadDevOutEPInterrupt
+     /tmp/cclPFygS.s:2293   .text.USB_ReadDevInEPInterrupt:00000000 $t
+ARM GAS  /tmp/cclPFygS.s 			page 65
+
+
+     /tmp/cclPFygS.s:2298   .text.USB_ReadDevInEPInterrupt:00000000 USB_ReadDevInEPInterrupt
+     /tmp/cclPFygS.s:2315   .text.USB_ClearInterrupts:00000000 $t
+     /tmp/cclPFygS.s:2320   .text.USB_ClearInterrupts:00000000 USB_ClearInterrupts
+     /tmp/cclPFygS.s:2335   .text.USB_EP0_OutStart:00000000 $t
+     /tmp/cclPFygS.s:2340   .text.USB_EP0_OutStart:00000000 USB_EP0_OutStart
+     /tmp/cclPFygS.s:2357   .text.USB_ActivateRemoteWakeup:00000000 $t
+     /tmp/cclPFygS.s:2362   .text.USB_ActivateRemoteWakeup:00000000 USB_ActivateRemoteWakeup
+     /tmp/cclPFygS.s:2387   .text.USB_DeActivateRemoteWakeup:00000000 $t
+     /tmp/cclPFygS.s:2392   .text.USB_DeActivateRemoteWakeup:00000000 USB_DeActivateRemoteWakeup
+     /tmp/cclPFygS.s:2417   .text.USB_WritePMA:00000000 $t
+     /tmp/cclPFygS.s:2422   .text.USB_WritePMA:00000000 USB_WritePMA
+     /tmp/cclPFygS.s:2483   .text.USB_ReadPMA:00000000 $t
+     /tmp/cclPFygS.s:2488   .text.USB_ReadPMA:00000000 USB_ReadPMA
+                     .debug_frame:00000010 $d
+
+NO UNDEFINED SYMBOLS

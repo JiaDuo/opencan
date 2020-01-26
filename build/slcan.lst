@@ -1,0 +1,3019 @@
+ARM GAS  /tmp/ccTu2vyu.s 			page 1
+
+
+   1              		.syntax unified
+   2              		.cpu cortex-m0
+   3              		.fpu softvfp
+   4              		.eabi_attribute 20, 1
+   5              		.eabi_attribute 21, 1
+   6              		.eabi_attribute 23, 3
+   7              		.eabi_attribute 24, 1
+   8              		.eabi_attribute 25, 1
+   9              		.eabi_attribute 26, 1
+  10              		.eabi_attribute 30, 2
+  11              		.eabi_attribute 34, 0
+  12              		.eabi_attribute 18, 4
+  13              		.thumb
+  14              		.syntax unified
+  15              		.file	"slcan.c"
+  16              		.text
+  17              	.Ltext0:
+  18              		.cfi_sections	.debug_frame
+  19              		.section	.text.cmd_reff.part.3,"ax",%progbits
+  20              		.align	2
+  21              		.code	16
+  22              		.thumb_func
+  24              	cmd_reff.part.3:
+  25              	.LFB65:
+  26              		.file 1 "Src/slcan_port/slcan.c"
+   1:Src/slcan_port/slcan.c **** #include "slcan.h"
+   2:Src/slcan_port/slcan.c **** 
+   3:Src/slcan_port/slcan.c **** 
+   4:Src/slcan_port/slcan.c **** 
+   5:Src/slcan_port/slcan.c **** char cmd_buf[CMD_BUF_MAX]={0};
+   6:Src/slcan_port/slcan.c **** int	cmd_buf_off = 0;
+   7:Src/slcan_port/slcan.c **** 
+   8:Src/slcan_port/slcan.c **** /* hcan.Init.Prescaler value 8=1Mbps*/
+   9:Src/slcan_port/slcan.c **** const uint32_t bitrate_map[9]={800,400,160,80,64,32,16,10,8};
+  10:Src/slcan_port/slcan.c **** const char hex_str_map[16]={'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
+  11:Src/slcan_port/slcan.c **** 
+  12:Src/slcan_port/slcan.c **** /* slcan response function */
+  13:Src/slcan_port/slcan.c **** #define cmd_response(buf,len) {\
+  14:Src/slcan_port/slcan.c **** 	CDC_Transmit_FS((uint8_t*)buf,len);\
+  15:Src/slcan_port/slcan.c **** }
+  16:Src/slcan_port/slcan.c **** 
+  17:Src/slcan_port/slcan.c **** /* rx stand frame to cmd str */
+  18:Src/slcan_port/slcan.c **** void sff_to_cmd(CAN_RxHeaderTypeDef* header,uint8_t data[])
+  19:Src/slcan_port/slcan.c **** {
+  20:Src/slcan_port/slcan.c **** 	StandFrame_def cmd_frame;
+  21:Src/slcan_port/slcan.c **** 	uint32_t cmd_len;
+  22:Src/slcan_port/slcan.c **** 	cmd_frame.cmd = CMD_SFF;
+  23:Src/slcan_port/slcan.c **** 	int2hex(header->StdId,3,cmd_frame.id);
+  24:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+  25:Src/slcan_port/slcan.c **** 	for(cmd_len = 0;cmd_len < header->DLC;cmd_len++)
+  26:Src/slcan_port/slcan.c **** 	{
+  27:Src/slcan_port/slcan.c **** 		int2hex(data[cmd_len],2,cmd_frame.data+(cmd_len<<1));
+  28:Src/slcan_port/slcan.c **** 	}
+  29:Src/slcan_port/slcan.c **** 	cmd_len = ((header->DLC)<<1) + 5 + 1;
+  30:Src/slcan_port/slcan.c **** 	((uint8_t*)&cmd_frame)[cmd_len-1] = CMD_CR;
+  31:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+  32:Src/slcan_port/slcan.c **** }
+ARM GAS  /tmp/ccTu2vyu.s 			page 2
+
+
+  33:Src/slcan_port/slcan.c **** 
+  34:Src/slcan_port/slcan.c **** /* rx extend frame to cmd str */
+  35:Src/slcan_port/slcan.c **** void eff_to_cmd(CAN_RxHeaderTypeDef* header,uint8_t data[])
+  36:Src/slcan_port/slcan.c **** {
+  37:Src/slcan_port/slcan.c **** 	ExtendFrame_def cmd_frame;
+  38:Src/slcan_port/slcan.c **** 	uint32_t cmd_len;
+  39:Src/slcan_port/slcan.c **** 	cmd_frame.cmd = CMD_EFF;
+  40:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+  41:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+  42:Src/slcan_port/slcan.c **** 	for(cmd_len = 0;cmd_len < header->DLC;cmd_len++)
+  43:Src/slcan_port/slcan.c **** 	{
+  44:Src/slcan_port/slcan.c **** 		int2hex(data[cmd_len],2,cmd_frame.data+(cmd_len<<1));
+  45:Src/slcan_port/slcan.c **** 	}
+  46:Src/slcan_port/slcan.c **** 	cmd_len = ((header->DLC)<<1) + 10 + 1;
+  47:Src/slcan_port/slcan.c **** 	((uint8_t*)&cmd_frame)[cmd_len-1] = CMD_CR;
+  48:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+  49:Src/slcan_port/slcan.c **** }
+  50:Src/slcan_port/slcan.c **** 
+  51:Src/slcan_port/slcan.c **** /* rx remote request stand frame to cmd str */
+  52:Src/slcan_port/slcan.c **** void rsff_to_cmd(CAN_RxHeaderTypeDef* header)
+  53:Src/slcan_port/slcan.c **** {
+  54:Src/slcan_port/slcan.c **** 	RemoteStandFrame_def cmd_frame;
+  55:Src/slcan_port/slcan.c **** 	uint32_t cmd_len;
+  56:Src/slcan_port/slcan.c **** 	cmd_frame.cmd = CMD_RSFF;
+  57:Src/slcan_port/slcan.c **** 	int2hex(header->StdId,3,cmd_frame.id);
+  58:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+  59:Src/slcan_port/slcan.c **** 	cmd_len = 6;
+  60:Src/slcan_port/slcan.c **** 	cmd_frame.cr = CMD_CR;
+  61:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+  62:Src/slcan_port/slcan.c **** }
+  63:Src/slcan_port/slcan.c **** 
+  64:Src/slcan_port/slcan.c **** /* rx remote request extend frame to cmd str */
+  65:Src/slcan_port/slcan.c **** void reff_to_cmd(CAN_RxHeaderTypeDef* header)
+  66:Src/slcan_port/slcan.c **** {
+  67:Src/slcan_port/slcan.c **** 	RemoteExtendFrame_def cmd_frame;
+  68:Src/slcan_port/slcan.c **** 	uint32_t cmd_len;
+  69:Src/slcan_port/slcan.c **** 	cmd_frame.cmd = CMD_REFF;
+  70:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+  71:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+  72:Src/slcan_port/slcan.c **** 	cmd_len = 11;
+  73:Src/slcan_port/slcan.c **** 	cmd_frame.cr = CMD_CR;
+  74:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+  75:Src/slcan_port/slcan.c **** }
+  76:Src/slcan_port/slcan.c **** 
+  77:Src/slcan_port/slcan.c **** /* can recv interrupt callback */
+  78:Src/slcan_port/slcan.c **** void HAL_CAN_RxFifo0MsgPendingCallback(CAN_HandleTypeDef *hcan)
+  79:Src/slcan_port/slcan.c **** {
+  80:Src/slcan_port/slcan.c **** 	CAN_RxHeaderTypeDef can_rx_header;
+  81:Src/slcan_port/slcan.c **** 	uint8_t can_rx_buf[8];
+  82:Src/slcan_port/slcan.c **** 	int8_t can_rx_count = HAL_CAN_GetRxFifoFillLevel(hcan,CAN_RX_FIFO0);
+  83:Src/slcan_port/slcan.c **** 	for(;can_rx_count > 0;can_rx_count--)
+  84:Src/slcan_port/slcan.c **** 	{
+  85:Src/slcan_port/slcan.c **** 		if (HAL_CAN_GetRxMessage(hcan,CAN_RX_FIFO0,&can_rx_header,can_rx_buf) == HAL_OK)
+  86:Src/slcan_port/slcan.c **** 		{ 
+  87:Src/slcan_port/slcan.c **** 			if(can_rx_header.IDE == CAN_ID_STD)
+  88:Src/slcan_port/slcan.c **** 			{
+  89:Src/slcan_port/slcan.c **** 				if(can_rx_header.RTR == CAN_RTR_DATA)
+ARM GAS  /tmp/ccTu2vyu.s 			page 3
+
+
+  90:Src/slcan_port/slcan.c **** 				{
+  91:Src/slcan_port/slcan.c **** 					sff_to_cmd(&can_rx_header,can_rx_buf);
+  92:Src/slcan_port/slcan.c **** 				}
+  93:Src/slcan_port/slcan.c **** 				else if(can_rx_header.RTR == CAN_RTR_REMOTE)
+  94:Src/slcan_port/slcan.c **** 				{
+  95:Src/slcan_port/slcan.c **** 					rsff_to_cmd(&can_rx_header);
+  96:Src/slcan_port/slcan.c **** 				}
+  97:Src/slcan_port/slcan.c **** 			}
+  98:Src/slcan_port/slcan.c **** 			else if(can_rx_header.IDE == CAN_ID_EXT)
+  99:Src/slcan_port/slcan.c **** 			{
+ 100:Src/slcan_port/slcan.c **** 				if(can_rx_header.RTR == CAN_RTR_DATA)
+ 101:Src/slcan_port/slcan.c **** 				{
+ 102:Src/slcan_port/slcan.c **** 					eff_to_cmd(&can_rx_header,can_rx_buf);
+ 103:Src/slcan_port/slcan.c **** 				}
+ 104:Src/slcan_port/slcan.c **** 				else if(can_rx_header.RTR == CAN_RTR_REMOTE)
+ 105:Src/slcan_port/slcan.c **** 				{
+ 106:Src/slcan_port/slcan.c **** 					reff_to_cmd(&can_rx_header);
+ 107:Src/slcan_port/slcan.c **** 				}
+ 108:Src/slcan_port/slcan.c **** 			}
+ 109:Src/slcan_port/slcan.c **** 		} 
+ 110:Src/slcan_port/slcan.c **** 	}
+ 111:Src/slcan_port/slcan.c **** }
+ 112:Src/slcan_port/slcan.c **** 
+ 113:Src/slcan_port/slcan.c **** /* set can bitrate */
+ 114:Src/slcan_port/slcan.c **** /* only change the hcan.Init.Prescaler value = 6 = 1Mbps*/
+ 115:Src/slcan_port/slcan.c **** /* This command is only active if the CAN channel is closed */
+ 116:Src/slcan_port/slcan.c **** void cmd_set_bitrate(char *cmd){
+ 117:Src/slcan_port/slcan.c **** 	uint8_t res_code=CMD_CR;
+ 118:Src/slcan_port/slcan.c **** 	SetupBitrate_def *p = (SetupBitrate_def*)cmd;
+ 119:Src/slcan_port/slcan.c **** 	if (hcan.State == HAL_CAN_STATE_READY){
+ 120:Src/slcan_port/slcan.c **** 		hcan.Init.Prescaler = bitrate_map[hex2int(&(p->speed),1)];
+ 121:Src/slcan_port/slcan.c **** 		if (HAL_CAN_Init(&hcan) != HAL_OK)
+ 122:Src/slcan_port/slcan.c **** 		{
+ 123:Src/slcan_port/slcan.c **** 			res_code = CMD_BELL;
+ 124:Src/slcan_port/slcan.c **** 		}
+ 125:Src/slcan_port/slcan.c **** 	}else{
+ 126:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 127:Src/slcan_port/slcan.c **** 	}
+ 128:Src/slcan_port/slcan.c **** 	cmd_response(&res_code,1);
+ 129:Src/slcan_port/slcan.c **** }
+ 130:Src/slcan_port/slcan.c **** 
+ 131:Src/slcan_port/slcan.c **** /* return the version */
+ 132:Src/slcan_port/slcan.c **** void cmd_version(char *cmd){
+ 133:Src/slcan_port/slcan.c **** 	char res_code[6]={CMD_VER,};
+ 134:Src/slcan_port/slcan.c **** 	res_code[1] = HW_VERSION[0];
+ 135:Src/slcan_port/slcan.c **** 	res_code[2] = HW_VERSION[1];
+ 136:Src/slcan_port/slcan.c **** 	res_code[3] = SW_VERSION[0];
+ 137:Src/slcan_port/slcan.c **** 	res_code[4] = SW_VERSION[1];
+ 138:Src/slcan_port/slcan.c **** 	res_code[5] = CMD_CR;
+ 139:Src/slcan_port/slcan.c **** 	cmd_response(res_code,6);
+ 140:Src/slcan_port/slcan.c **** }
+ 141:Src/slcan_port/slcan.c **** 
+ 142:Src/slcan_port/slcan.c **** /* return the serial number */
+ 143:Src/slcan_port/slcan.c **** void cmd_sn(char *cmd){
+ 144:Src/slcan_port/slcan.c **** 	char res_code[6]={CMD_SN,};
+ 145:Src/slcan_port/slcan.c **** 	/* Read MCU Id, 32-bit access */
+ 146:Src/slcan_port/slcan.c **** 	uint32_t MCU_Id = DBGMCU->IDCODE;
+ARM GAS  /tmp/ccTu2vyu.s 			page 4
+
+
+ 147:Src/slcan_port/slcan.c **** 	int2hex(MCU_Id,4,res_code + 1);
+ 148:Src/slcan_port/slcan.c **** 	res_code[5] = CMD_CR;
+ 149:Src/slcan_port/slcan.c **** 	cmd_response(res_code,6);
+ 150:Src/slcan_port/slcan.c **** }
+ 151:Src/slcan_port/slcan.c **** 
+ 152:Src/slcan_port/slcan.c **** /* set btr , not used!! */
+ 153:Src/slcan_port/slcan.c **** void cmd_set_btr(char *cmd){
+ 154:Src/slcan_port/slcan.c **** 	uint8_t btr0=0,btr1=0;
+ 155:Src/slcan_port/slcan.c **** 	btr0 = hex2int(((SetupBtr_def*)cmd)->btr0,2);
+ 156:Src/slcan_port/slcan.c **** 	btr1 = hex2int(((SetupBtr_def*)cmd)->btr1,2);
+ 157:Src/slcan_port/slcan.c **** 	cmd_response(CMD_ACK,1);
+ 158:Src/slcan_port/slcan.c **** 	UNUSED(btr0);
+ 159:Src/slcan_port/slcan.c **** 	UNUSED(btr1);
+ 160:Src/slcan_port/slcan.c **** }
+ 161:Src/slcan_port/slcan.c **** 
+ 162:Src/slcan_port/slcan.c **** /* open can */
+ 163:Src/slcan_port/slcan.c **** void cmd_open(){
+ 164:Src/slcan_port/slcan.c **** 	uint8_t res_code=CMD_CR;
+ 165:Src/slcan_port/slcan.c **** 	if (HAL_CAN_Start(&hcan) != HAL_OK){
+ 166:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 167:Src/slcan_port/slcan.c **** 	}
+ 168:Src/slcan_port/slcan.c **** 	cmd_response(&res_code,1);
+ 169:Src/slcan_port/slcan.c **** }
+ 170:Src/slcan_port/slcan.c **** 
+ 171:Src/slcan_port/slcan.c **** /* close can */
+ 172:Src/slcan_port/slcan.c **** void cmd_close(){
+ 173:Src/slcan_port/slcan.c **** 	uint8_t res_code=CMD_CR;
+ 174:Src/slcan_port/slcan.c **** 	if (HAL_CAN_Stop(&hcan) != HAL_OK){
+ 175:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 176:Src/slcan_port/slcan.c **** 	}
+ 177:Src/slcan_port/slcan.c **** 	cmd_response(&res_code,1);
+ 178:Src/slcan_port/slcan.c **** }
+ 179:Src/slcan_port/slcan.c **** 
+ 180:Src/slcan_port/slcan.c **** /* timestamp set, not used!! */
+ 181:Src/slcan_port/slcan.c **** void cmd_timestamp(char *cmd){
+ 182:Src/slcan_port/slcan.c **** 	uint8_t onoff = hex2int(&((TimeStamp_def *)cmd)->timestamp,1);
+ 183:Src/slcan_port/slcan.c **** 	cmd_response(CMD_ACK,1);
+ 184:Src/slcan_port/slcan.c **** 	UNUSED(onoff);
+ 185:Src/slcan_port/slcan.c **** }
+ 186:Src/slcan_port/slcan.c **** 
+ 187:Src/slcan_port/slcan.c **** /* tx stand can frame*/
+ 188:Src/slcan_port/slcan.c **** void cmd_sff(char *cmd){
+ 189:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 190:Src/slcan_port/slcan.c **** 	uint8_t i;
+ 191:Src/slcan_port/slcan.c **** 	uint32_t mailbox;
+ 192:Src/slcan_port/slcan.c **** 	uint8_t res_code[2];
+ 193:Src/slcan_port/slcan.c **** 	CAN_TxHeaderTypeDef can_tx_header;
+ 194:Src/slcan_port/slcan.c **** 	StandFrame_def *p = (StandFrame_def*)cmd;
+ 195:Src/slcan_port/slcan.c **** 	can_tx_header.StdId = hex2int(p->id,3);
+ 196:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 197:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 198:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_DATA;
+ 199:Src/slcan_port/slcan.c **** 	for(i=0;i<can_tx_header.DLC;i++){
+ 200:Src/slcan_port/slcan.c **** 		can_data[i] = hex2int(p->data+(i<<1),2);
+ 201:Src/slcan_port/slcan.c **** 	}
+ 202:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 203:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ARM GAS  /tmp/ccTu2vyu.s 			page 5
+
+
+ 204:Src/slcan_port/slcan.c **** 	}
+ 205:Src/slcan_port/slcan.c **** 	else{
+ 206:Src/slcan_port/slcan.c **** 		res_code[0]=CMD_BELL;
+ 207:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 208:Src/slcan_port/slcan.c **** 	}
+ 209:Src/slcan_port/slcan.c **** }
+ 210:Src/slcan_port/slcan.c **** 
+ 211:Src/slcan_port/slcan.c **** /* tx extend can frame*/
+ 212:Src/slcan_port/slcan.c **** void cmd_eff(char *cmd){
+ 213:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 214:Src/slcan_port/slcan.c **** 	uint8_t i;
+ 215:Src/slcan_port/slcan.c **** 	uint32_t mailbox;
+ 216:Src/slcan_port/slcan.c **** 	uint8_t res_code[2];
+ 217:Src/slcan_port/slcan.c **** 	CAN_TxHeaderTypeDef can_tx_header;
+ 218:Src/slcan_port/slcan.c **** 	ExtendFrame_def *p = (ExtendFrame_def*)cmd;
+ 219:Src/slcan_port/slcan.c **** 	can_tx_header.ExtId = hex2int(p->id,8);
+ 220:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 221:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_EXT;
+ 222:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_DATA;
+ 223:Src/slcan_port/slcan.c **** 	for(i=0;i<can_tx_header.DLC;i++){
+ 224:Src/slcan_port/slcan.c **** 		can_data[i] = hex2int(p->data+(i<<1),2);
+ 225:Src/slcan_port/slcan.c **** 	}
+ 226:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 227:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ 228:Src/slcan_port/slcan.c **** 	}
+ 229:Src/slcan_port/slcan.c **** 	else{
+ 230:Src/slcan_port/slcan.c **** 		res_code[0]=CMD_BELL;
+ 231:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 232:Src/slcan_port/slcan.c **** 	}
+ 233:Src/slcan_port/slcan.c **** }
+ 234:Src/slcan_port/slcan.c **** 
+ 235:Src/slcan_port/slcan.c **** /* tx remote request stand can frame*/
+ 236:Src/slcan_port/slcan.c **** void cmd_rsff(char *cmd){
+ 237:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 238:Src/slcan_port/slcan.c **** 	uint32_t mailbox;
+ 239:Src/slcan_port/slcan.c **** 	uint8_t res_code[2];
+ 240:Src/slcan_port/slcan.c **** 	CAN_TxHeaderTypeDef can_tx_header;
+ 241:Src/slcan_port/slcan.c **** 	RemoteStandFrame_def *p = (RemoteStandFrame_def*)cmd;
+ 242:Src/slcan_port/slcan.c **** 	can_tx_header.StdId = hex2int(p->id,3);
+ 243:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 244:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 245:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_REMOTE;
+ 246:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 247:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ 248:Src/slcan_port/slcan.c **** 	}
+ 249:Src/slcan_port/slcan.c **** 	else{
+ 250:Src/slcan_port/slcan.c **** 		res_code[0]=CMD_BELL;
+ 251:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 252:Src/slcan_port/slcan.c **** 	}
+ 253:Src/slcan_port/slcan.c **** }
+ 254:Src/slcan_port/slcan.c **** 
+ 255:Src/slcan_port/slcan.c **** /* tx remote request extend can frame*/
+ 256:Src/slcan_port/slcan.c **** void cmd_reff(char *cmd){
+  27              		.loc 1 256 0
+  28              		.cfi_startproc
+  29              		@ args = 0, pretend = 0, frame = 0
+  30              		@ frame_needed = 0, uses_anonymous_args = 0
+ARM GAS  /tmp/ccTu2vyu.s 			page 6
+
+
+  31              	.LVL0:
+  32 0000 10B5     		push	{r4, lr}
+  33              	.LCFI0:
+  34              		.cfi_def_cfa_offset 8
+  35              		.cfi_offset 4, -8
+  36              		.cfi_offset 14, -4
+ 257:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 258:Src/slcan_port/slcan.c **** 	uint32_t mailbox;
+ 259:Src/slcan_port/slcan.c **** 	uint8_t res_code[2];
+ 260:Src/slcan_port/slcan.c **** 	CAN_TxHeaderTypeDef can_tx_header;
+ 261:Src/slcan_port/slcan.c **** 	RemoteExtendFrame_def *p = (RemoteExtendFrame_def*)cmd;
+ 262:Src/slcan_port/slcan.c **** 	can_tx_header.ExtId = hex2int(p->id,8);
+ 263:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 264:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_EXT;
+ 265:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_REMOTE;
+ 266:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 267:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+  37              		.loc 1 267 0
+  38 0002 0221     		movs	r1, #2
+  39 0004 0148     		ldr	r0, .L2
+  40 0006 FFF7FEFF 		bl	CDC_Transmit_FS
+  41              	.LVL1:
+ 268:Src/slcan_port/slcan.c **** 	}
+ 269:Src/slcan_port/slcan.c **** 	else{
+ 270:Src/slcan_port/slcan.c **** 		res_code[0]=CMD_BELL;
+ 271:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 272:Src/slcan_port/slcan.c **** 	}
+ 273:Src/slcan_port/slcan.c **** }
+  42              		.loc 1 273 0
+  43              		@ sp needed
+  44 000a 10BD     		pop	{r4, pc}
+  45              	.L3:
+  46              		.align	2
+  47              	.L2:
+  48 000c 00000000 		.word	.LC0
+  49              		.cfi_endproc
+  50              	.LFE65:
+  52              		.thumb_set cmd_sff.part.0,cmd_reff.part.3
+  53              		.thumb_set cmd_eff.part.1,cmd_reff.part.3
+  54              		.thumb_set cmd_rsff.part.2,cmd_reff.part.3
+  55              		.section	.text.sff_to_cmd,"ax",%progbits
+  56              		.align	2
+  57              		.global	sff_to_cmd
+  58              		.code	16
+  59              		.thumb_func
+  61              	sff_to_cmd:
+  62              	.LFB41:
+  19:Src/slcan_port/slcan.c **** 	StandFrame_def cmd_frame;
+  63              		.loc 1 19 0
+  64              		.cfi_startproc
+  65              		@ args = 0, pretend = 0, frame = 32
+  66              		@ frame_needed = 0, uses_anonymous_args = 0
+  67              	.LVL2:
+  68              	.LBB28:
+  69              	.LBB29:
+ 274:Src/slcan_port/slcan.c **** 
+ 275:Src/slcan_port/slcan.c **** /* process one slcan cmd */
+ARM GAS  /tmp/ccTu2vyu.s 			page 7
+
+
+ 276:Src/slcan_port/slcan.c **** int slcan_cmd_task(char *cmd){
+ 277:Src/slcan_port/slcan.c **** 	//printf("cmd:%s\n",cmd);
+ 278:Src/slcan_port/slcan.c **** 	switch(cmd[0])
+ 279:Src/slcan_port/slcan.c **** 	{
+ 280:Src/slcan_port/slcan.c **** 		case CMD_SET_BITRATE:
+ 281:Src/slcan_port/slcan.c **** 			cmd_set_bitrate(cmd);
+ 282:Src/slcan_port/slcan.c **** 			break;
+ 283:Src/slcan_port/slcan.c **** 		case CMD_SET_BTR:
+ 284:Src/slcan_port/slcan.c **** 			cmd_set_btr(cmd);
+ 285:Src/slcan_port/slcan.c **** 			break;
+ 286:Src/slcan_port/slcan.c **** 		case CMD_OPEN:
+ 287:Src/slcan_port/slcan.c **** 			cmd_open();
+ 288:Src/slcan_port/slcan.c **** 			break;
+ 289:Src/slcan_port/slcan.c **** 		case CMD_CLOSE:
+ 290:Src/slcan_port/slcan.c **** 			cmd_close();
+ 291:Src/slcan_port/slcan.c **** 			break;
+ 292:Src/slcan_port/slcan.c **** 		case CMD_SFF:
+ 293:Src/slcan_port/slcan.c **** 			cmd_sff(cmd);
+ 294:Src/slcan_port/slcan.c **** 			break;
+ 295:Src/slcan_port/slcan.c **** 		case CMD_EFF:
+ 296:Src/slcan_port/slcan.c **** 			cmd_eff(cmd);
+ 297:Src/slcan_port/slcan.c **** 			break;
+ 298:Src/slcan_port/slcan.c **** 		case CMD_RSFF:
+ 299:Src/slcan_port/slcan.c **** 			cmd_rsff(cmd);
+ 300:Src/slcan_port/slcan.c **** 			break;
+ 301:Src/slcan_port/slcan.c **** 		case CMD_REFF:
+ 302:Src/slcan_port/slcan.c **** 			cmd_reff(cmd);
+ 303:Src/slcan_port/slcan.c **** 			break;
+ 304:Src/slcan_port/slcan.c **** 		case CMD_RSF:
+ 305:Src/slcan_port/slcan.c **** 			break;
+ 306:Src/slcan_port/slcan.c **** 		case CMD_TIMESTAMP:
+ 307:Src/slcan_port/slcan.c **** 			cmd_timestamp(cmd);
+ 308:Src/slcan_port/slcan.c **** 			break;
+ 309:Src/slcan_port/slcan.c **** 		case CMD_ACCEPT_MASK:
+ 310:Src/slcan_port/slcan.c **** 			break;
+ 311:Src/slcan_port/slcan.c **** 		case CMD_ACCEPT_VALUE:
+ 312:Src/slcan_port/slcan.c **** 			break;
+ 313:Src/slcan_port/slcan.c **** 		case CMD_VER:
+ 314:Src/slcan_port/slcan.c **** 			cmd_version(cmd);
+ 315:Src/slcan_port/slcan.c **** 			break;
+ 316:Src/slcan_port/slcan.c **** 		case CMD_SN:
+ 317:Src/slcan_port/slcan.c **** 			cmd_sn(cmd);
+ 318:Src/slcan_port/slcan.c **** 			break;
+ 319:Src/slcan_port/slcan.c **** 		default:
+ 320:Src/slcan_port/slcan.c **** 			break;
+ 321:Src/slcan_port/slcan.c **** 
+ 322:Src/slcan_port/slcan.c **** 	}
+ 323:Src/slcan_port/slcan.c **** 	return 0;
+ 324:Src/slcan_port/slcan.c **** }
+ 325:Src/slcan_port/slcan.c **** 
+ 326:Src/slcan_port/slcan.c **** /* get strings from usart and process  */
+ 327:Src/slcan_port/slcan.c **** int slcan_cdc_process(char *st,int len){
+ 328:Src/slcan_port/slcan.c **** 	char cmd[50] ={0};
+ 329:Src/slcan_port/slcan.c **** 	int i = 0;
+ 330:Src/slcan_port/slcan.c **** 	for(i=0 ;i< len;i++){
+ 331:Src/slcan_port/slcan.c **** 		if (cmd_buf_off >= (CMD_BUF_MAX-1)){
+ 332:Src/slcan_port/slcan.c **** 			//printf("cmd_buff overflow\n");
+ARM GAS  /tmp/ccTu2vyu.s 			page 8
+
+
+ 333:Src/slcan_port/slcan.c **** 			return -1;
+ 334:Src/slcan_port/slcan.c **** 		}
+ 335:Src/slcan_port/slcan.c **** 		//get a complete cmd str
+ 336:Src/slcan_port/slcan.c **** 		if(st[i] == CMD_CR && cmd_buf_off ){
+ 337:Src/slcan_port/slcan.c **** 			memcpy(cmd,cmd_buf,cmd_buf_off);
+ 338:Src/slcan_port/slcan.c **** 			cmd[cmd_buf_off] =0;
+ 339:Src/slcan_port/slcan.c **** 			cmd_buf_off = 0;
+ 340:Src/slcan_port/slcan.c **** 			//process it
+ 341:Src/slcan_port/slcan.c **** 			slcan_cmd_task(cmd);
+ 342:Src/slcan_port/slcan.c **** 		}else{
+ 343:Src/slcan_port/slcan.c **** 			cmd_buf[cmd_buf_off++] = st[i];
+ 344:Src/slcan_port/slcan.c **** 		}
+ 345:Src/slcan_port/slcan.c **** 	}
+ 346:Src/slcan_port/slcan.c **** 	return 0;
+ 347:Src/slcan_port/slcan.c **** }
+ 348:Src/slcan_port/slcan.c **** 
+ 349:Src/slcan_port/slcan.c **** uint32_t hex2int(char *hex,uint8_t len) {
+ 350:Src/slcan_port/slcan.c ****     uint32_t val = 0,i=0;
+ 351:Src/slcan_port/slcan.c ****     while (i<len && hex[i] ) {
+ 352:Src/slcan_port/slcan.c ****         // get current character then increment
+ 353:Src/slcan_port/slcan.c ****         uint8_t byte = hex[i++]; 
+ 354:Src/slcan_port/slcan.c ****         // transform hex character to the 4bit equivalent number, using the ascii table indexes
+ 355:Src/slcan_port/slcan.c ****         if (byte >= '0' && byte <= '9') byte = byte - '0';
+ 356:Src/slcan_port/slcan.c ****         else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+ 357:Src/slcan_port/slcan.c ****         else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;   
+ 358:Src/slcan_port/slcan.c **** 		else return -1; 
+ 359:Src/slcan_port/slcan.c ****         // shift 4 to make space for new digit, and add the 4 bits of the new digit 
+ 360:Src/slcan_port/slcan.c ****         val = (val << 4) | (byte & 0xF);
+ 361:Src/slcan_port/slcan.c ****     }
+ 362:Src/slcan_port/slcan.c ****     return val;
+ 363:Src/slcan_port/slcan.c **** }
+ 364:Src/slcan_port/slcan.c **** 
+ 365:Src/slcan_port/slcan.c **** void int2hex(uint32_t data,int len,char * out){
+ 366:Src/slcan_port/slcan.c **** 	while(len > 0){
+ 367:Src/slcan_port/slcan.c **** 		out[len-1] = hex_str_map[data & 0xf];
+  70              		.loc 1 367 0
+  71 0000 0F22     		movs	r2, #15
+  72              	.LBE29:
+  73              	.LBE28:
+  19:Src/slcan_port/slcan.c **** 	StandFrame_def cmd_frame;
+  74              		.loc 1 19 0
+  75 0002 F0B5     		push	{r4, r5, r6, r7, lr}
+  76              	.LCFI1:
+  77              		.cfi_def_cfa_offset 20
+  78              		.cfi_offset 4, -20
+  79              		.cfi_offset 5, -16
+  80              		.cfi_offset 6, -12
+  81              		.cfi_offset 7, -8
+  82              		.cfi_offset 14, -4
+  83 0004 4646     		mov	r6, r8
+  84 0006 4F46     		mov	r7, r9
+  22:Src/slcan_port/slcan.c **** 	int2hex(header->StdId,3,cmd_frame.id);
+  85              		.loc 1 22 0
+  86 0008 7423     		movs	r3, #116
+  19:Src/slcan_port/slcan.c **** 	StandFrame_def cmd_frame;
+  87              		.loc 1 19 0
+  88 000a 8846     		mov	r8, r1
+ARM GAS  /tmp/ccTu2vyu.s 			page 9
+
+
+  89              	.LBB35:
+  90              	.LBB30:
+  91              		.loc 1 367 0
+  92 000c 1100     		movs	r1, r2
+  93              	.LVL3:
+  94              	.LBE30:
+  95              	.LBE35:
+  19:Src/slcan_port/slcan.c **** 	StandFrame_def cmd_frame;
+  96              		.loc 1 19 0
+  97 000e C0B4     		push	{r6, r7}
+  98              	.LCFI2:
+  99              		.cfi_def_cfa_offset 28
+ 100              		.cfi_offset 8, -28
+ 101              		.cfi_offset 9, -24
+ 102 0010 89B0     		sub	sp, sp, #36
+ 103              	.LCFI3:
+ 104              		.cfi_def_cfa_offset 64
+  22:Src/slcan_port/slcan.c **** 	int2hex(header->StdId,3,cmd_frame.id);
+ 105              		.loc 1 22 0
+ 106 0012 01AF     		add	r7, sp, #4
+ 107 0014 3B70     		strb	r3, [r7]
+  23:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+ 108              		.loc 1 23 0
+ 109 0016 0368     		ldr	r3, [r0]
+ 110              	.LVL4:
+ 111              	.LBB36:
+ 112              	.LBB31:
+ 113              		.loc 1 367 0
+ 114 0018 1C4D     		ldr	r5, .L12
+ 115 001a 1940     		ands	r1, r3
+ 116 001c 695C     		ldrb	r1, [r5, r1]
+ 117              	.LBE31:
+ 118              	.LBE36:
+  24:Src/slcan_port/slcan.c **** 	for(cmd_len = 0;cmd_len < header->DLC;cmd_len++)
+ 119              		.loc 1 24 0
+ 120 001e 0669     		ldr	r6, [r0, #16]
+ 121              	.LBB37:
+ 122              	.LBB32:
+ 123              		.loc 1 367 0
+ 124 0020 F970     		strb	r1, [r7, #3]
+ 368:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 125              		.loc 1 368 0
+ 126 0022 1909     		lsrs	r1, r3, #4
+ 127              	.LVL5:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 128              		.loc 1 367 0
+ 129 0024 1B0A     		lsrs	r3, r3, #8
+ 130 0026 1340     		ands	r3, r2
+ 131 0028 EB5C     		ldrb	r3, [r5, r3]
+ 132 002a 1140     		ands	r1, r2
+ 133              	.LVL6:
+ 134              	.LBE32:
+ 135              	.LBE37:
+ 136              	.LBB38:
+ 137              	.LBB39:
+ 138 002c 3240     		ands	r2, r6
+ 139              	.LBE39:
+ARM GAS  /tmp/ccTu2vyu.s 			page 10
+
+
+ 140              	.LBE38:
+ 141              	.LBB42:
+ 142              	.LBB33:
+ 143 002e 695C     		ldrb	r1, [r5, r1]
+ 144 0030 7B70     		strb	r3, [r7, #1]
+ 145              	.LBE33:
+ 146              	.LBE42:
+ 147              	.LBB43:
+ 148              	.LBB40:
+ 149 0032 AB5C     		ldrb	r3, [r5, r2]
+ 150              	.LBE40:
+ 151              	.LBE43:
+ 152              	.LBB44:
+ 153              	.LBB34:
+ 154 0034 B970     		strb	r1, [r7, #2]
+ 155              	.LVL7:
+ 156              	.LBE34:
+ 157              	.LBE44:
+ 158              	.LBB45:
+ 159              	.LBB41:
+ 160 0036 3B71     		strb	r3, [r7, #4]
+ 161              	.LVL8:
+ 162              	.LBE41:
+ 163              	.LBE45:
+  25:Src/slcan_port/slcan.c **** 	{
+ 164              		.loc 1 25 0
+ 165 0038 002E     		cmp	r6, #0
+ 166 003a 23D0     		beq	.L11
+ 167 003c 0922     		movs	r2, #9
+ 168 003e 6A44     		add	r2, r2, sp
+ 169 0040 9446     		mov	ip, r2
+ 170              	.LBB46:
+ 171              	.LBB47:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 172              		.loc 1 367 0 discriminator 3
+ 173 0042 0F22     		movs	r2, #15
+ 174 0044 0A20     		movs	r0, #10
+ 175              	.LVL9:
+ 176              	.LBE47:
+ 177              	.LBE46:
+  25:Src/slcan_port/slcan.c **** 	{
+ 178              		.loc 1 25 0 discriminator 3
+ 179 0046 0023     		movs	r3, #0
+ 180              	.LBB52:
+ 181              	.LBB48:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 182              		.loc 1 367 0 discriminator 3
+ 183 0048 9146     		mov	r9, r2
+ 184 004a 6844     		add	r0, r0, sp
+ 185              	.LVL10:
+ 186              	.L6:
+ 187              	.LBE48:
+ 188              	.LBE52:
+  27:Src/slcan_port/slcan.c **** 	}
+ 189              		.loc 1 27 0 discriminator 3
+ 190 004c 4246     		mov	r2, r8
+ 191              	.LBB53:
+ARM GAS  /tmp/ccTu2vyu.s 			page 11
+
+
+ 192              	.LBB49:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 193              		.loc 1 367 0 discriminator 3
+ 194 004e 4946     		mov	r1, r9
+ 195              	.LBE49:
+ 196              	.LBE53:
+  27:Src/slcan_port/slcan.c **** 	}
+ 197              		.loc 1 27 0 discriminator 3
+ 198 0050 D25C     		ldrb	r2, [r2, r3]
+ 199 0052 5C00     		lsls	r4, r3, #1
+ 200              	.LVL11:
+ 201              	.LBB54:
+ 202              	.LBB50:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 203              		.loc 1 367 0 discriminator 3
+ 204 0054 1140     		ands	r1, r2
+ 205 0056 695C     		ldrb	r1, [r5, r1]
+ 206 0058 1209     		lsrs	r2, r2, #4
+ 207              	.LVL12:
+ 208 005a 0155     		strb	r1, [r0, r4]
+ 209              	.LVL13:
+ 210 005c 6146     		mov	r1, ip
+ 211 005e AA5C     		ldrb	r2, [r5, r2]
+ 212              	.LBE50:
+ 213              	.LBE54:
+  25:Src/slcan_port/slcan.c **** 	{
+ 214              		.loc 1 25 0 discriminator 3
+ 215 0060 0133     		adds	r3, r3, #1
+ 216              	.LVL14:
+ 217              	.LBB55:
+ 218              	.LBB51:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 219              		.loc 1 367 0 discriminator 3
+ 220 0062 0A55     		strb	r2, [r1, r4]
+ 221              	.LVL15:
+ 222              	.LBE51:
+ 223              	.LBE55:
+  25:Src/slcan_port/slcan.c **** 	{
+ 224              		.loc 1 25 0 discriminator 3
+ 225 0064 9E42     		cmp	r6, r3
+ 226 0066 F1D1     		bne	.L6
+ 227              	.LVL16:
+ 228              	.L7:
+  30:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 229              		.loc 1 30 0
+ 230 0068 0D23     		movs	r3, #13
+ 231 006a 6246     		mov	r2, ip
+  29:Src/slcan_port/slcan.c **** 	((uint8_t*)&cmd_frame)[cmd_len-1] = CMD_CR;
+ 232              		.loc 1 29 0
+ 233 006c 7600     		lsls	r6, r6, #1
+ 234              	.LVL17:
+  30:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 235              		.loc 1 30 0
+ 236 006e 9355     		strb	r3, [r2, r6]
+  31:Src/slcan_port/slcan.c **** }
+ 237              		.loc 1 31 0
+ 238 0070 0636     		adds	r6, r6, #6
+ARM GAS  /tmp/ccTu2vyu.s 			page 12
+
+
+ 239              	.LVL18:
+ 240 0072 B1B2     		uxth	r1, r6
+ 241 0074 3800     		movs	r0, r7
+ 242 0076 FFF7FEFF 		bl	CDC_Transmit_FS
+ 243              	.LVL19:
+  32:Src/slcan_port/slcan.c **** 
+ 244              		.loc 1 32 0
+ 245 007a 09B0     		add	sp, sp, #36
+ 246              		@ sp needed
+ 247              	.LVL20:
+ 248              	.LVL21:
+ 249 007c 0CBC     		pop	{r2, r3}
+ 250 007e 9046     		mov	r8, r2
+ 251 0080 9946     		mov	r9, r3
+ 252 0082 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 253              	.LVL22:
+ 254              	.L11:
+ 255 0084 0923     		movs	r3, #9
+ 256 0086 6B44     		add	r3, r3, sp
+ 257 0088 9C46     		mov	ip, r3
+ 258 008a EDE7     		b	.L7
+ 259              	.L13:
+ 260              		.align	2
+ 261              	.L12:
+ 262 008c 00000000 		.word	.LANCHOR0
+ 263              		.cfi_endproc
+ 264              	.LFE41:
+ 266              		.section	.text.eff_to_cmd,"ax",%progbits
+ 267              		.align	2
+ 268              		.global	eff_to_cmd
+ 269              		.code	16
+ 270              		.thumb_func
+ 272              	eff_to_cmd:
+ 273              	.LFB42:
+  36:Src/slcan_port/slcan.c **** 	ExtendFrame_def cmd_frame;
+ 274              		.loc 1 36 0
+ 275              		.cfi_startproc
+ 276              		@ args = 0, pretend = 0, frame = 32
+ 277              		@ frame_needed = 0, uses_anonymous_args = 0
+ 278              	.LVL23:
+ 279 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 280              	.LCFI4:
+ 281              		.cfi_def_cfa_offset 20
+ 282              		.cfi_offset 4, -20
+ 283              		.cfi_offset 5, -16
+ 284              		.cfi_offset 6, -12
+ 285              		.cfi_offset 7, -8
+ 286              		.cfi_offset 14, -4
+ 287 0002 4746     		mov	r7, r8
+ 288 0004 80B4     		push	{r7}
+ 289              	.LCFI5:
+ 290              		.cfi_def_cfa_offset 24
+ 291              		.cfi_offset 8, -24
+ 292 0006 88B0     		sub	sp, sp, #32
+ 293              	.LCFI6:
+ 294              		.cfi_def_cfa_offset 56
+  39:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+ARM GAS  /tmp/ccTu2vyu.s 			page 13
+
+
+ 295              		.loc 1 39 0
+ 296 0008 5423     		movs	r3, #84
+ 297 000a 6A46     		mov	r2, sp
+ 298              	.LBB56:
+ 299              	.LBB57:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 300              		.loc 1 367 0
+ 301 000c 0F26     		movs	r6, #15
+ 302              	.LBE57:
+ 303              	.LBE56:
+  39:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+ 304              		.loc 1 39 0
+ 305 000e 1370     		strb	r3, [r2]
+ 306 0010 1C4C     		ldr	r4, .L23
+  40:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+ 307              		.loc 1 40 0
+ 308 0012 4268     		ldr	r2, [r0, #4]
+ 309              	.LVL24:
+ 310 0014 4C3B     		subs	r3, r3, #76
+ 311              	.LVL25:
+ 312              	.L15:
+ 313              	.LBB59:
+ 314              	.LBB58:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 315              		.loc 1 367 0
+ 316 0016 3500     		movs	r5, r6
+ 317 0018 6F46     		mov	r7, sp
+ 318 001a 1540     		ands	r5, r2
+ 319 001c 655D     		ldrb	r5, [r4, r5]
+ 320              		.loc 1 368 0
+ 321 001e 1209     		lsrs	r2, r2, #4
+ 322              	.LVL26:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 323              		.loc 1 367 0
+ 324 0020 FD54     		strb	r5, [r7, r3]
+ 369:Src/slcan_port/slcan.c **** 		len--;
+ 325              		.loc 1 369 0
+ 326 0022 013B     		subs	r3, r3, #1
+ 327              	.LVL27:
+ 366:Src/slcan_port/slcan.c **** 		out[len-1] = hex_str_map[data & 0xf];
+ 328              		.loc 1 366 0
+ 329 0024 002B     		cmp	r3, #0
+ 330 0026 F6D1     		bne	.L15
+ 331              	.LVL28:
+ 332              	.LBE58:
+ 333              	.LBE59:
+  41:Src/slcan_port/slcan.c **** 	for(cmd_len = 0;cmd_len < header->DLC;cmd_len++)
+ 334              		.loc 1 41 0
+ 335 0028 0569     		ldr	r5, [r0, #16]
+ 336              	.LVL29:
+ 337              	.LBB60:
+ 338              	.LBB61:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 339              		.loc 1 367 0
+ 340 002a 0F33     		adds	r3, r3, #15
+ 341 002c 2B40     		ands	r3, r5
+ 342 002e E35C     		ldrb	r3, [r4, r3]
+ARM GAS  /tmp/ccTu2vyu.s 			page 14
+
+
+ 343 0030 7B72     		strb	r3, [r7, #9]
+ 344              	.LVL30:
+ 345              	.LBE61:
+ 346              	.LBE60:
+  42:Src/slcan_port/slcan.c **** 	{
+ 347              		.loc 1 42 0
+ 348 0032 002D     		cmp	r5, #0
+ 349 0034 21D0     		beq	.L22
+ 350 0036 0A22     		movs	r2, #10
+ 351 0038 6A44     		add	r2, r2, sp
+ 352 003a 9446     		mov	ip, r2
+ 353              	.LBB62:
+ 354              	.LBB63:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 355              		.loc 1 367 0 discriminator 3
+ 356 003c 0F22     		movs	r2, #15
+ 357 003e 0B26     		movs	r6, #11
+ 358              	.LBE63:
+ 359              	.LBE62:
+  42:Src/slcan_port/slcan.c **** 	{
+ 360              		.loc 1 42 0 discriminator 3
+ 361 0040 0023     		movs	r3, #0
+ 362              	.LBB67:
+ 363              	.LBB64:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 364              		.loc 1 367 0 discriminator 3
+ 365 0042 9046     		mov	r8, r2
+ 366 0044 6E44     		add	r6, r6, sp
+ 367              	.LVL31:
+ 368              	.L17:
+ 369 0046 4746     		mov	r7, r8
+ 370              	.LBE64:
+ 371              	.LBE67:
+  44:Src/slcan_port/slcan.c **** 	}
+ 372              		.loc 1 44 0 discriminator 3
+ 373 0048 CA5C     		ldrb	r2, [r1, r3]
+ 374 004a 5800     		lsls	r0, r3, #1
+ 375              	.LVL32:
+ 376              	.LBB68:
+ 377              	.LBB65:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 378              		.loc 1 367 0 discriminator 3
+ 379 004c 1740     		ands	r7, r2
+ 380 004e E75D     		ldrb	r7, [r4, r7]
+ 381 0050 1209     		lsrs	r2, r2, #4
+ 382              	.LVL33:
+ 383 0052 3754     		strb	r7, [r6, r0]
+ 384              	.LVL34:
+ 385 0054 6746     		mov	r7, ip
+ 386 0056 A25C     		ldrb	r2, [r4, r2]
+ 387              	.LBE65:
+ 388              	.LBE68:
+  42:Src/slcan_port/slcan.c **** 	{
+ 389              		.loc 1 42 0 discriminator 3
+ 390 0058 0133     		adds	r3, r3, #1
+ 391              	.LVL35:
+ 392              	.LBB69:
+ARM GAS  /tmp/ccTu2vyu.s 			page 15
+
+
+ 393              	.LBB66:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 394              		.loc 1 367 0 discriminator 3
+ 395 005a 3A54     		strb	r2, [r7, r0]
+ 396              	.LVL36:
+ 397              	.LBE66:
+ 398              	.LBE69:
+  42:Src/slcan_port/slcan.c **** 	{
+ 399              		.loc 1 42 0 discriminator 3
+ 400 005c 9D42     		cmp	r5, r3
+ 401 005e F2D1     		bne	.L17
+ 402              	.LVL37:
+ 403              	.L18:
+  47:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 404              		.loc 1 47 0
+ 405 0060 0D23     		movs	r3, #13
+ 406 0062 6246     		mov	r2, ip
+  46:Src/slcan_port/slcan.c **** 	((uint8_t*)&cmd_frame)[cmd_len-1] = CMD_CR;
+ 407              		.loc 1 46 0
+ 408 0064 6D00     		lsls	r5, r5, #1
+ 409              	.LVL38:
+  47:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 410              		.loc 1 47 0
+ 411 0066 5355     		strb	r3, [r2, r5]
+  48:Src/slcan_port/slcan.c **** }
+ 412              		.loc 1 48 0
+ 413 0068 0B35     		adds	r5, r5, #11
+ 414              	.LVL39:
+ 415 006a A9B2     		uxth	r1, r5
+ 416              	.LVL40:
+ 417 006c 6846     		mov	r0, sp
+ 418 006e FFF7FEFF 		bl	CDC_Transmit_FS
+ 419              	.LVL41:
+  49:Src/slcan_port/slcan.c **** 
+ 420              		.loc 1 49 0
+ 421 0072 08B0     		add	sp, sp, #32
+ 422              		@ sp needed
+ 423              	.LVL42:
+ 424 0074 04BC     		pop	{r2}
+ 425 0076 9046     		mov	r8, r2
+ 426 0078 F0BD     		pop	{r4, r5, r6, r7, pc}
+ 427              	.LVL43:
+ 428              	.L22:
+ 429 007a 0A23     		movs	r3, #10
+ 430 007c 6B44     		add	r3, r3, sp
+ 431 007e 9C46     		mov	ip, r3
+ 432 0080 EEE7     		b	.L18
+ 433              	.L24:
+ 434 0082 C046     		.align	2
+ 435              	.L23:
+ 436 0084 00000000 		.word	.LANCHOR0
+ 437              		.cfi_endproc
+ 438              	.LFE42:
+ 440              		.section	.text.rsff_to_cmd,"ax",%progbits
+ 441              		.align	2
+ 442              		.global	rsff_to_cmd
+ 443              		.code	16
+ARM GAS  /tmp/ccTu2vyu.s 			page 16
+
+
+ 444              		.thumb_func
+ 446              	rsff_to_cmd:
+ 447              	.LFB43:
+  53:Src/slcan_port/slcan.c **** 	RemoteStandFrame_def cmd_frame;
+ 448              		.loc 1 53 0
+ 449              		.cfi_startproc
+ 450              		@ args = 0, pretend = 0, frame = 8
+ 451              		@ frame_needed = 0, uses_anonymous_args = 0
+ 452              	.LVL44:
+ 453 0000 30B5     		push	{r4, r5, lr}
+ 454              	.LCFI7:
+ 455              		.cfi_def_cfa_offset 12
+ 456              		.cfi_offset 4, -12
+ 457              		.cfi_offset 5, -8
+ 458              		.cfi_offset 14, -4
+ 459 0002 83B0     		sub	sp, sp, #12
+ 460              	.LCFI8:
+ 461              		.cfi_def_cfa_offset 24
+  56:Src/slcan_port/slcan.c **** 	int2hex(header->StdId,3,cmd_frame.id);
+ 462              		.loc 1 56 0
+ 463 0004 6A46     		mov	r2, sp
+ 464 0006 7223     		movs	r3, #114
+ 465 0008 1370     		strb	r3, [r2]
+ 466              	.LBB70:
+ 467              	.LBB71:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 468              		.loc 1 367 0
+ 469 000a 0F22     		movs	r2, #15
+ 470 000c 1400     		movs	r4, r2
+ 471 000e 6D46     		mov	r5, sp
+ 472              	.LBE71:
+ 473              	.LBE70:
+  57:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+ 474              		.loc 1 57 0
+ 475 0010 0368     		ldr	r3, [r0]
+ 476              	.LVL45:
+ 477              	.LBB75:
+ 478              	.LBB72:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 479              		.loc 1 367 0
+ 480 0012 0C49     		ldr	r1, .L26
+ 481 0014 1C40     		ands	r4, r3
+ 482 0016 0C5D     		ldrb	r4, [r1, r4]
+ 483 0018 EC70     		strb	r4, [r5, #3]
+ 368:Src/slcan_port/slcan.c **** 		len--;
+ 484              		.loc 1 368 0
+ 485 001a 1C09     		lsrs	r4, r3, #4
+ 486              	.LVL46:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 487              		.loc 1 367 0
+ 488 001c 1B0A     		lsrs	r3, r3, #8
+ 489 001e 1340     		ands	r3, r2
+ 490 0020 CB5C     		ldrb	r3, [r1, r3]
+ 491 0022 1440     		ands	r4, r2
+ 492              	.LVL47:
+ 493 0024 6B70     		strb	r3, [r5, #1]
+ 494              	.LBE72:
+ARM GAS  /tmp/ccTu2vyu.s 			page 17
+
+
+ 495              	.LBE75:
+ 496              	.LBB76:
+ 497              	.LBB77:
+ 498 0026 0369     		ldr	r3, [r0, #16]
+ 499              	.LBE77:
+ 500              	.LBE76:
+ 501              	.LBB80:
+ 502              	.LBB73:
+ 503 0028 0C5D     		ldrb	r4, [r1, r4]
+ 504              	.LBE73:
+ 505              	.LBE80:
+ 506              	.LBB81:
+ 507              	.LBB78:
+ 508 002a 1A40     		ands	r2, r3
+ 509 002c 8B5C     		ldrb	r3, [r1, r2]
+ 510              	.LBE78:
+ 511              	.LBE81:
+  61:Src/slcan_port/slcan.c **** }
+ 512              		.loc 1 61 0
+ 513 002e 6846     		mov	r0, sp
+ 514              	.LVL48:
+ 515              	.LBB82:
+ 516              	.LBB79:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 517              		.loc 1 367 0
+ 518 0030 2B71     		strb	r3, [r5, #4]
+ 519              	.LBE79:
+ 520              	.LBE82:
+  60:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 521              		.loc 1 60 0
+ 522 0032 0D23     		movs	r3, #13
+  61:Src/slcan_port/slcan.c **** }
+ 523              		.loc 1 61 0
+ 524 0034 0621     		movs	r1, #6
+ 525              	.LBB83:
+ 526              	.LBB74:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 527              		.loc 1 367 0
+ 528 0036 AC70     		strb	r4, [r5, #2]
+ 529              	.LVL49:
+ 530              	.LBE74:
+ 531              	.LBE83:
+  60:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 532              		.loc 1 60 0
+ 533 0038 6B71     		strb	r3, [r5, #5]
+  61:Src/slcan_port/slcan.c **** }
+ 534              		.loc 1 61 0
+ 535 003a FFF7FEFF 		bl	CDC_Transmit_FS
+ 536              	.LVL50:
+  62:Src/slcan_port/slcan.c **** 
+ 537              		.loc 1 62 0
+ 538 003e 03B0     		add	sp, sp, #12
+ 539              		@ sp needed
+ 540 0040 30BD     		pop	{r4, r5, pc}
+ 541              	.L27:
+ 542 0042 C046     		.align	2
+ 543              	.L26:
+ARM GAS  /tmp/ccTu2vyu.s 			page 18
+
+
+ 544 0044 00000000 		.word	.LANCHOR0
+ 545              		.cfi_endproc
+ 546              	.LFE43:
+ 548              		.section	.text.reff_to_cmd,"ax",%progbits
+ 549              		.align	2
+ 550              		.global	reff_to_cmd
+ 551              		.code	16
+ 552              		.thumb_func
+ 554              	reff_to_cmd:
+ 555              	.LFB44:
+  66:Src/slcan_port/slcan.c **** 	RemoteExtendFrame_def cmd_frame;
+ 556              		.loc 1 66 0
+ 557              		.cfi_startproc
+ 558              		@ args = 0, pretend = 0, frame = 16
+ 559              		@ frame_needed = 0, uses_anonymous_args = 0
+ 560              	.LVL51:
+  69:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+ 561              		.loc 1 69 0
+ 562 0000 5223     		movs	r3, #82
+  66:Src/slcan_port/slcan.c **** 	RemoteExtendFrame_def cmd_frame;
+ 563              		.loc 1 66 0
+ 564 0002 70B5     		push	{r4, r5, r6, lr}
+ 565              	.LCFI9:
+ 566              		.cfi_def_cfa_offset 16
+ 567              		.cfi_offset 4, -16
+ 568              		.cfi_offset 5, -12
+ 569              		.cfi_offset 6, -8
+ 570              		.cfi_offset 14, -4
+ 571              	.LBB84:
+ 572              	.LBB85:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 573              		.loc 1 367 0
+ 574 0004 0F26     		movs	r6, #15
+ 575              	.LBE85:
+ 576              	.LBE84:
+  66:Src/slcan_port/slcan.c **** 	RemoteExtendFrame_def cmd_frame;
+ 577              		.loc 1 66 0
+ 578 0006 84B0     		sub	sp, sp, #16
+ 579              	.LCFI10:
+ 580              		.cfi_def_cfa_offset 32
+  69:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+ 581              		.loc 1 69 0
+ 582 0008 01AC     		add	r4, sp, #4
+  70:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+ 583              		.loc 1 70 0
+ 584 000a 4268     		ldr	r2, [r0, #4]
+ 585              	.LVL52:
+ 586 000c 0B4D     		ldr	r5, .L31
+  69:Src/slcan_port/slcan.c **** 	int2hex(header->ExtId,8,cmd_frame.id);
+ 587              		.loc 1 69 0
+ 588 000e 2370     		strb	r3, [r4]
+  70:Src/slcan_port/slcan.c **** 	int2hex(header->DLC,1,&cmd_frame.len);
+ 589              		.loc 1 70 0
+ 590 0010 4A3B     		subs	r3, r3, #74
+ 591              	.LVL53:
+ 592              	.L29:
+ 593              	.LBB87:
+ARM GAS  /tmp/ccTu2vyu.s 			page 19
+
+
+ 594              	.LBB86:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 595              		.loc 1 367 0
+ 596 0012 3100     		movs	r1, r6
+ 597 0014 1140     		ands	r1, r2
+ 598 0016 695C     		ldrb	r1, [r5, r1]
+ 368:Src/slcan_port/slcan.c **** 		len--;
+ 599              		.loc 1 368 0
+ 600 0018 1209     		lsrs	r2, r2, #4
+ 601              	.LVL54:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 602              		.loc 1 367 0
+ 603 001a E154     		strb	r1, [r4, r3]
+ 604              		.loc 1 369 0
+ 605 001c 013B     		subs	r3, r3, #1
+ 606              	.LVL55:
+ 366:Src/slcan_port/slcan.c **** 		out[len-1] = hex_str_map[data & 0xf];
+ 607              		.loc 1 366 0
+ 608 001e 002B     		cmp	r3, #0
+ 609 0020 F7D1     		bne	.L29
+ 610              	.LVL56:
+ 611              	.LBE86:
+ 612              	.LBE87:
+ 613              	.LBB88:
+ 614              	.LBB89:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 615              		.loc 1 367 0
+ 616 0022 0269     		ldr	r2, [r0, #16]
+ 617 0024 0F33     		adds	r3, r3, #15
+ 618 0026 1340     		ands	r3, r2
+ 619 0028 EB5C     		ldrb	r3, [r5, r3]
+ 620              	.LBE89:
+ 621              	.LBE88:
+  74:Src/slcan_port/slcan.c **** }
+ 622              		.loc 1 74 0
+ 623 002a 0B21     		movs	r1, #11
+ 624              	.LBB91:
+ 625              	.LBB90:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 626              		.loc 1 367 0
+ 627 002c 6372     		strb	r3, [r4, #9]
+ 628              	.LVL57:
+ 629              	.LBE90:
+ 630              	.LBE91:
+  73:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 631              		.loc 1 73 0
+ 632 002e 0D23     		movs	r3, #13
+  74:Src/slcan_port/slcan.c **** }
+ 633              		.loc 1 74 0
+ 634 0030 2000     		movs	r0, r4
+ 635              	.LVL58:
+  73:Src/slcan_port/slcan.c **** 	cmd_response(&cmd_frame,cmd_len);
+ 636              		.loc 1 73 0
+ 637 0032 A372     		strb	r3, [r4, #10]
+  74:Src/slcan_port/slcan.c **** }
+ 638              		.loc 1 74 0
+ 639 0034 FFF7FEFF 		bl	CDC_Transmit_FS
+ARM GAS  /tmp/ccTu2vyu.s 			page 20
+
+
+ 640              	.LVL59:
+  75:Src/slcan_port/slcan.c **** 
+ 641              		.loc 1 75 0
+ 642 0038 04B0     		add	sp, sp, #16
+ 643              		@ sp needed
+ 644 003a 70BD     		pop	{r4, r5, r6, pc}
+ 645              	.L32:
+ 646              		.align	2
+ 647              	.L31:
+ 648 003c 00000000 		.word	.LANCHOR0
+ 649              		.cfi_endproc
+ 650              	.LFE44:
+ 652              		.section	.text.HAL_CAN_RxFifo0MsgPendingCallback,"ax",%progbits
+ 653              		.align	2
+ 654              		.global	HAL_CAN_RxFifo0MsgPendingCallback
+ 655              		.code	16
+ 656              		.thumb_func
+ 658              	HAL_CAN_RxFifo0MsgPendingCallback:
+ 659              	.LFB45:
+  79:Src/slcan_port/slcan.c **** 	CAN_RxHeaderTypeDef can_rx_header;
+ 660              		.loc 1 79 0
+ 661              		.cfi_startproc
+ 662              		@ args = 0, pretend = 0, frame = 40
+ 663              		@ frame_needed = 0, uses_anonymous_args = 0
+ 664              	.LVL60:
+ 665 0000 30B5     		push	{r4, r5, lr}
+ 666              	.LCFI11:
+ 667              		.cfi_def_cfa_offset 12
+ 668              		.cfi_offset 4, -12
+ 669              		.cfi_offset 5, -8
+ 670              		.cfi_offset 14, -4
+  82:Src/slcan_port/slcan.c **** 	for(;can_rx_count > 0;can_rx_count--)
+ 671              		.loc 1 82 0
+ 672 0002 0021     		movs	r1, #0
+  79:Src/slcan_port/slcan.c **** 	CAN_RxHeaderTypeDef can_rx_header;
+ 673              		.loc 1 79 0
+ 674 0004 8BB0     		sub	sp, sp, #44
+ 675              	.LCFI12:
+ 676              		.cfi_def_cfa_offset 56
+  79:Src/slcan_port/slcan.c **** 	CAN_RxHeaderTypeDef can_rx_header;
+ 677              		.loc 1 79 0
+ 678 0006 0500     		movs	r5, r0
+  82:Src/slcan_port/slcan.c **** 	for(;can_rx_count > 0;can_rx_count--)
+ 679              		.loc 1 82 0
+ 680 0008 FFF7FEFF 		bl	HAL_CAN_GetRxFifoFillLevel
+ 681              	.LVL61:
+ 682 000c 44B2     		sxtb	r4, r0
+ 683              	.LVL62:
+  83:Src/slcan_port/slcan.c **** 	{
+ 684              		.loc 1 83 0
+ 685 000e 002C     		cmp	r4, #0
+ 686 0010 0ADC     		bgt	.L41
+ 687 0012 1FE0     		b	.L33
+ 688              	.L45:
+  89:Src/slcan_port/slcan.c **** 				{
+ 689              		.loc 1 89 0
+ 690 0014 069B     		ldr	r3, [sp, #24]
+ARM GAS  /tmp/ccTu2vyu.s 			page 21
+
+
+ 691 0016 002B     		cmp	r3, #0
+ 692 0018 1ED0     		beq	.L43
+  93:Src/slcan_port/slcan.c **** 				{
+ 693              		.loc 1 93 0
+ 694 001a 022B     		cmp	r3, #2
+ 695 001c 21D0     		beq	.L44
+ 696              	.L35:
+ 697 001e 013C     		subs	r4, r4, #1
+ 698              	.LVL63:
+ 699 0020 E0B2     		uxtb	r0, r4
+ 700 0022 44B2     		sxtb	r4, r0
+ 701              	.LVL64:
+  83:Src/slcan_port/slcan.c **** 	{
+ 702              		.loc 1 83 0
+ 703 0024 0028     		cmp	r0, #0
+ 704 0026 15D0     		beq	.L33
+ 705              	.L41:
+  85:Src/slcan_port/slcan.c **** 		{ 
+ 706              		.loc 1 85 0
+ 707 0028 01AB     		add	r3, sp, #4
+ 708 002a 03AA     		add	r2, sp, #12
+ 709 002c 0021     		movs	r1, #0
+ 710 002e 2800     		movs	r0, r5
+ 711 0030 FFF7FEFF 		bl	HAL_CAN_GetRxMessage
+ 712              	.LVL65:
+ 713 0034 0028     		cmp	r0, #0
+ 714 0036 F2D1     		bne	.L35
+  87:Src/slcan_port/slcan.c **** 			{
+ 715              		.loc 1 87 0
+ 716 0038 059B     		ldr	r3, [sp, #20]
+ 717 003a 002B     		cmp	r3, #0
+ 718 003c EAD0     		beq	.L45
+  98:Src/slcan_port/slcan.c **** 			{
+ 719              		.loc 1 98 0
+ 720 003e 042B     		cmp	r3, #4
+ 721 0040 EDD1     		bne	.L35
+ 100:Src/slcan_port/slcan.c **** 				{
+ 722              		.loc 1 100 0
+ 723 0042 069B     		ldr	r3, [sp, #24]
+ 724 0044 002B     		cmp	r3, #0
+ 725 0046 10D0     		beq	.L46
+ 104:Src/slcan_port/slcan.c **** 				{
+ 726              		.loc 1 104 0
+ 727 0048 022B     		cmp	r3, #2
+ 728 004a E8D1     		bne	.L35
+ 106:Src/slcan_port/slcan.c **** 				}
+ 729              		.loc 1 106 0
+ 730 004c 03A8     		add	r0, sp, #12
+ 731 004e FFF7FEFF 		bl	reff_to_cmd
+ 732              	.LVL66:
+ 733 0052 E4E7     		b	.L35
+ 734              	.L33:
+ 111:Src/slcan_port/slcan.c **** 
+ 735              		.loc 1 111 0
+ 736 0054 0BB0     		add	sp, sp, #44
+ 737              		@ sp needed
+ 738              	.LVL67:
+ARM GAS  /tmp/ccTu2vyu.s 			page 22
+
+
+ 739              	.LVL68:
+ 740 0056 30BD     		pop	{r4, r5, pc}
+ 741              	.LVL69:
+ 742              	.L43:
+  91:Src/slcan_port/slcan.c **** 				}
+ 743              		.loc 1 91 0
+ 744 0058 01A9     		add	r1, sp, #4
+ 745 005a 03A8     		add	r0, sp, #12
+ 746 005c FFF7FEFF 		bl	sff_to_cmd
+ 747              	.LVL70:
+ 748 0060 DDE7     		b	.L35
+ 749              	.L44:
+  95:Src/slcan_port/slcan.c **** 				}
+ 750              		.loc 1 95 0
+ 751 0062 03A8     		add	r0, sp, #12
+ 752 0064 FFF7FEFF 		bl	rsff_to_cmd
+ 753              	.LVL71:
+ 754 0068 D9E7     		b	.L35
+ 755              	.L46:
+ 102:Src/slcan_port/slcan.c **** 				}
+ 756              		.loc 1 102 0
+ 757 006a 01A9     		add	r1, sp, #4
+ 758 006c 03A8     		add	r0, sp, #12
+ 759 006e FFF7FEFF 		bl	eff_to_cmd
+ 760              	.LVL72:
+ 761 0072 D4E7     		b	.L35
+ 762              		.cfi_endproc
+ 763              	.LFE45:
+ 765              		.section	.text.cmd_version,"ax",%progbits
+ 766              		.align	2
+ 767              		.global	cmd_version
+ 768              		.code	16
+ 769              		.thumb_func
+ 771              	cmd_version:
+ 772              	.LFB47:
+ 132:Src/slcan_port/slcan.c **** 	char res_code[6]={CMD_VER,};
+ 773              		.loc 1 132 0
+ 774              		.cfi_startproc
+ 775              		@ args = 0, pretend = 0, frame = 8
+ 776              		@ frame_needed = 0, uses_anonymous_args = 0
+ 777              	.LVL73:
+ 778 0000 00B5     		push	{lr}
+ 779              	.LCFI13:
+ 780              		.cfi_def_cfa_offset 4
+ 781              		.cfi_offset 14, -4
+ 782 0002 83B0     		sub	sp, sp, #12
+ 783              	.LCFI14:
+ 784              		.cfi_def_cfa_offset 16
+ 133:Src/slcan_port/slcan.c **** 	res_code[1] = HW_VERSION[0];
+ 785              		.loc 1 133 0
+ 786 0004 0622     		movs	r2, #6
+ 787 0006 0021     		movs	r1, #0
+ 788 0008 6846     		mov	r0, sp
+ 789              	.LVL74:
+ 790 000a FFF7FEFF 		bl	memset
+ 791              	.LVL75:
+ 792 000e 6A46     		mov	r2, sp
+ARM GAS  /tmp/ccTu2vyu.s 			page 23
+
+
+ 793 0010 5623     		movs	r3, #86
+ 794 0012 1370     		strb	r3, [r2]
+ 134:Src/slcan_port/slcan.c **** 	res_code[2] = HW_VERSION[1];
+ 795              		.loc 1 134 0
+ 796 0014 3122     		movs	r2, #49
+ 797 0016 6B46     		mov	r3, sp
+ 135:Src/slcan_port/slcan.c **** 	res_code[3] = SW_VERSION[0];
+ 798              		.loc 1 135 0
+ 799 0018 6946     		mov	r1, sp
+ 134:Src/slcan_port/slcan.c **** 	res_code[2] = HW_VERSION[1];
+ 800              		.loc 1 134 0
+ 801 001a 5A70     		strb	r2, [r3, #1]
+ 135:Src/slcan_port/slcan.c **** 	res_code[3] = SW_VERSION[0];
+ 802              		.loc 1 135 0
+ 803 001c 3023     		movs	r3, #48
+ 804 001e 8B70     		strb	r3, [r1, #2]
+ 137:Src/slcan_port/slcan.c **** 	res_code[5] = CMD_CR;
+ 805              		.loc 1 137 0
+ 806 0020 0B71     		strb	r3, [r1, #4]
+ 138:Src/slcan_port/slcan.c **** 	cmd_response(res_code,6);
+ 807              		.loc 1 138 0
+ 808 0022 233B     		subs	r3, r3, #35
+ 136:Src/slcan_port/slcan.c **** 	res_code[4] = SW_VERSION[1];
+ 809              		.loc 1 136 0
+ 810 0024 CA70     		strb	r2, [r1, #3]
+ 138:Src/slcan_port/slcan.c **** 	cmd_response(res_code,6);
+ 811              		.loc 1 138 0
+ 812 0026 4B71     		strb	r3, [r1, #5]
+ 139:Src/slcan_port/slcan.c **** }
+ 813              		.loc 1 139 0
+ 814 0028 6846     		mov	r0, sp
+ 815 002a 0621     		movs	r1, #6
+ 816 002c FFF7FEFF 		bl	CDC_Transmit_FS
+ 817              	.LVL76:
+ 140:Src/slcan_port/slcan.c **** 
+ 818              		.loc 1 140 0
+ 819 0030 03B0     		add	sp, sp, #12
+ 820              		@ sp needed
+ 821 0032 00BD     		pop	{pc}
+ 822              		.cfi_endproc
+ 823              	.LFE47:
+ 825              		.section	.text.cmd_sn,"ax",%progbits
+ 826              		.align	2
+ 827              		.global	cmd_sn
+ 828              		.code	16
+ 829              		.thumb_func
+ 831              	cmd_sn:
+ 832              	.LFB48:
+ 143:Src/slcan_port/slcan.c **** 	char res_code[6]={CMD_SN,};
+ 833              		.loc 1 143 0
+ 834              		.cfi_startproc
+ 835              		@ args = 0, pretend = 0, frame = 8
+ 836              		@ frame_needed = 0, uses_anonymous_args = 0
+ 837              	.LVL77:
+ 838 0000 30B5     		push	{r4, r5, lr}
+ 839              	.LCFI15:
+ 840              		.cfi_def_cfa_offset 12
+ARM GAS  /tmp/ccTu2vyu.s 			page 24
+
+
+ 841              		.cfi_offset 4, -12
+ 842              		.cfi_offset 5, -8
+ 843              		.cfi_offset 14, -4
+ 844 0002 83B0     		sub	sp, sp, #12
+ 845              	.LCFI16:
+ 846              		.cfi_def_cfa_offset 24
+ 144:Src/slcan_port/slcan.c **** 	/* Read MCU Id, 32-bit access */
+ 847              		.loc 1 144 0
+ 848 0004 0622     		movs	r2, #6
+ 849 0006 0021     		movs	r1, #0
+ 850 0008 6846     		mov	r0, sp
+ 851              	.LVL78:
+ 852 000a FFF7FEFF 		bl	memset
+ 853              	.LVL79:
+ 854 000e 4E23     		movs	r3, #78
+ 855 0010 6A46     		mov	r2, sp
+ 856 0012 1370     		strb	r3, [r2]
+ 146:Src/slcan_port/slcan.c **** 	int2hex(MCU_Id,4,res_code + 1);
+ 857              		.loc 1 146 0
+ 858 0014 0A4B     		ldr	r3, .L51
+ 859              	.LBB92:
+ 860              	.LBB93:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 861              		.loc 1 367 0
+ 862 0016 0F20     		movs	r0, #15
+ 863              	.LBE93:
+ 864              	.LBE92:
+ 146:Src/slcan_port/slcan.c **** 	int2hex(MCU_Id,4,res_code + 1);
+ 865              		.loc 1 146 0
+ 866 0018 1A68     		ldr	r2, [r3]
+ 867              	.LVL80:
+ 868 001a 0423     		movs	r3, #4
+ 869 001c 094C     		ldr	r4, .L51+4
+ 870              	.LVL81:
+ 871              	.L49:
+ 872              	.LBB95:
+ 873              	.LBB94:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 874              		.loc 1 367 0
+ 875 001e 0100     		movs	r1, r0
+ 876 0020 6D46     		mov	r5, sp
+ 877 0022 1140     		ands	r1, r2
+ 878 0024 615C     		ldrb	r1, [r4, r1]
+ 368:Src/slcan_port/slcan.c **** 		len--;
+ 879              		.loc 1 368 0
+ 880 0026 1209     		lsrs	r2, r2, #4
+ 881              	.LVL82:
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 882              		.loc 1 367 0
+ 883 0028 E954     		strb	r1, [r5, r3]
+ 884              		.loc 1 369 0
+ 885 002a 013B     		subs	r3, r3, #1
+ 886              	.LVL83:
+ 366:Src/slcan_port/slcan.c **** 		out[len-1] = hex_str_map[data & 0xf];
+ 887              		.loc 1 366 0
+ 888 002c 002B     		cmp	r3, #0
+ 889 002e F6D1     		bne	.L49
+ARM GAS  /tmp/ccTu2vyu.s 			page 25
+
+
+ 890              	.LVL84:
+ 891              	.LBE94:
+ 892              	.LBE95:
+ 148:Src/slcan_port/slcan.c **** 	cmd_response(res_code,6);
+ 893              		.loc 1 148 0
+ 894 0030 0D33     		adds	r3, r3, #13
+ 149:Src/slcan_port/slcan.c **** }
+ 895              		.loc 1 149 0
+ 896 0032 0621     		movs	r1, #6
+ 897 0034 6846     		mov	r0, sp
+ 148:Src/slcan_port/slcan.c **** 	cmd_response(res_code,6);
+ 898              		.loc 1 148 0
+ 899 0036 6B71     		strb	r3, [r5, #5]
+ 149:Src/slcan_port/slcan.c **** }
+ 900              		.loc 1 149 0
+ 901 0038 FFF7FEFF 		bl	CDC_Transmit_FS
+ 902              	.LVL85:
+ 150:Src/slcan_port/slcan.c **** 
+ 903              		.loc 1 150 0
+ 904 003c 03B0     		add	sp, sp, #12
+ 905              		@ sp needed
+ 906 003e 30BD     		pop	{r4, r5, pc}
+ 907              	.L52:
+ 908              		.align	2
+ 909              	.L51:
+ 910 0040 00580140 		.word	1073829888
+ 911 0044 00000000 		.word	.LANCHOR0
+ 912              		.cfi_endproc
+ 913              	.LFE48:
+ 915              		.section	.text.cmd_open,"ax",%progbits
+ 916              		.align	2
+ 917              		.global	cmd_open
+ 918              		.code	16
+ 919              		.thumb_func
+ 921              	cmd_open:
+ 922              	.LFB50:
+ 163:Src/slcan_port/slcan.c **** 	uint8_t res_code=CMD_CR;
+ 923              		.loc 1 163 0
+ 924              		.cfi_startproc
+ 925              		@ args = 0, pretend = 0, frame = 8
+ 926              		@ frame_needed = 0, uses_anonymous_args = 0
+ 927 0000 00B5     		push	{lr}
+ 928              	.LCFI17:
+ 929              		.cfi_def_cfa_offset 4
+ 930              		.cfi_offset 14, -4
+ 931 0002 83B0     		sub	sp, sp, #12
+ 932              	.LCFI18:
+ 933              		.cfi_def_cfa_offset 16
+ 164:Src/slcan_port/slcan.c **** 	if (HAL_CAN_Start(&hcan) != HAL_OK){
+ 934              		.loc 1 164 0
+ 935 0004 0D23     		movs	r3, #13
+ 936 0006 6A46     		mov	r2, sp
+ 165:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 937              		.loc 1 165 0
+ 938 0008 0748     		ldr	r0, .L58
+ 164:Src/slcan_port/slcan.c **** 	if (HAL_CAN_Start(&hcan) != HAL_OK){
+ 939              		.loc 1 164 0
+ARM GAS  /tmp/ccTu2vyu.s 			page 26
+
+
+ 940 000a D371     		strb	r3, [r2, #7]
+ 165:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 941              		.loc 1 165 0
+ 942 000c FFF7FEFF 		bl	HAL_CAN_Start
+ 943              	.LVL86:
+ 944 0010 0028     		cmp	r0, #0
+ 945 0012 02D0     		beq	.L54
+ 166:Src/slcan_port/slcan.c **** 	}
+ 946              		.loc 1 166 0
+ 947 0014 0723     		movs	r3, #7
+ 948 0016 6A46     		mov	r2, sp
+ 949 0018 D371     		strb	r3, [r2, #7]
+ 950              	.L54:
+ 168:Src/slcan_port/slcan.c **** }
+ 951              		.loc 1 168 0
+ 952 001a 6B46     		mov	r3, sp
+ 953 001c 0121     		movs	r1, #1
+ 954 001e D81D     		adds	r0, r3, #7
+ 955 0020 FFF7FEFF 		bl	CDC_Transmit_FS
+ 956              	.LVL87:
+ 169:Src/slcan_port/slcan.c **** 
+ 957              		.loc 1 169 0
+ 958 0024 03B0     		add	sp, sp, #12
+ 959              		@ sp needed
+ 960 0026 00BD     		pop	{pc}
+ 961              	.L59:
+ 962              		.align	2
+ 963              	.L58:
+ 964 0028 00000000 		.word	hcan
+ 965              		.cfi_endproc
+ 966              	.LFE50:
+ 968              		.section	.text.cmd_close,"ax",%progbits
+ 969              		.align	2
+ 970              		.global	cmd_close
+ 971              		.code	16
+ 972              		.thumb_func
+ 974              	cmd_close:
+ 975              	.LFB51:
+ 172:Src/slcan_port/slcan.c **** 	uint8_t res_code=CMD_CR;
+ 976              		.loc 1 172 0
+ 977              		.cfi_startproc
+ 978              		@ args = 0, pretend = 0, frame = 8
+ 979              		@ frame_needed = 0, uses_anonymous_args = 0
+ 980 0000 00B5     		push	{lr}
+ 981              	.LCFI19:
+ 982              		.cfi_def_cfa_offset 4
+ 983              		.cfi_offset 14, -4
+ 984 0002 83B0     		sub	sp, sp, #12
+ 985              	.LCFI20:
+ 986              		.cfi_def_cfa_offset 16
+ 173:Src/slcan_port/slcan.c **** 	if (HAL_CAN_Stop(&hcan) != HAL_OK){
+ 987              		.loc 1 173 0
+ 988 0004 0D23     		movs	r3, #13
+ 989 0006 6A46     		mov	r2, sp
+ 174:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 990              		.loc 1 174 0
+ 991 0008 0748     		ldr	r0, .L65
+ARM GAS  /tmp/ccTu2vyu.s 			page 27
+
+
+ 173:Src/slcan_port/slcan.c **** 	if (HAL_CAN_Stop(&hcan) != HAL_OK){
+ 992              		.loc 1 173 0
+ 993 000a D371     		strb	r3, [r2, #7]
+ 174:Src/slcan_port/slcan.c **** 		res_code = CMD_BELL;
+ 994              		.loc 1 174 0
+ 995 000c FFF7FEFF 		bl	HAL_CAN_Stop
+ 996              	.LVL88:
+ 997 0010 0028     		cmp	r0, #0
+ 998 0012 02D0     		beq	.L61
+ 175:Src/slcan_port/slcan.c **** 	}
+ 999              		.loc 1 175 0
+ 1000 0014 0723     		movs	r3, #7
+ 1001 0016 6A46     		mov	r2, sp
+ 1002 0018 D371     		strb	r3, [r2, #7]
+ 1003              	.L61:
+ 177:Src/slcan_port/slcan.c **** }
+ 1004              		.loc 1 177 0
+ 1005 001a 6B46     		mov	r3, sp
+ 1006 001c 0121     		movs	r1, #1
+ 1007 001e D81D     		adds	r0, r3, #7
+ 1008 0020 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1009              	.LVL89:
+ 178:Src/slcan_port/slcan.c **** 
+ 1010              		.loc 1 178 0
+ 1011 0024 03B0     		add	sp, sp, #12
+ 1012              		@ sp needed
+ 1013 0026 00BD     		pop	{pc}
+ 1014              	.L66:
+ 1015              		.align	2
+ 1016              	.L65:
+ 1017 0028 00000000 		.word	hcan
+ 1018              		.cfi_endproc
+ 1019              	.LFE51:
+ 1021              		.section	.text.cmd_timestamp,"ax",%progbits
+ 1022              		.align	2
+ 1023              		.global	cmd_timestamp
+ 1024              		.code	16
+ 1025              		.thumb_func
+ 1027              	cmd_timestamp:
+ 1028              	.LFB52:
+ 181:Src/slcan_port/slcan.c **** 	uint8_t onoff = hex2int(&((TimeStamp_def *)cmd)->timestamp,1);
+ 1029              		.loc 1 181 0
+ 1030              		.cfi_startproc
+ 1031              		@ args = 0, pretend = 0, frame = 0
+ 1032              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1033              	.LVL90:
+ 1034 0000 10B5     		push	{r4, lr}
+ 1035              	.LCFI21:
+ 1036              		.cfi_def_cfa_offset 8
+ 1037              		.cfi_offset 4, -8
+ 1038              		.cfi_offset 14, -4
+ 183:Src/slcan_port/slcan.c **** 	UNUSED(onoff);
+ 1039              		.loc 1 183 0
+ 1040 0002 0121     		movs	r1, #1
+ 1041 0004 0148     		ldr	r0, .L68
+ 1042              	.LVL91:
+ 1043 0006 FFF7FEFF 		bl	CDC_Transmit_FS
+ARM GAS  /tmp/ccTu2vyu.s 			page 28
+
+
+ 1044              	.LVL92:
+ 185:Src/slcan_port/slcan.c **** 
+ 1045              		.loc 1 185 0
+ 1046              		@ sp needed
+ 1047 000a 10BD     		pop	{r4, pc}
+ 1048              	.L69:
+ 1049              		.align	2
+ 1050              	.L68:
+ 1051 000c 04000000 		.word	.LC11
+ 1052              		.cfi_endproc
+ 1053              	.LFE52:
+ 1055              		.section	.text.cmd_set_btr,"ax",%progbits
+ 1056              		.align	2
+ 1057              		.global	cmd_set_btr
+ 1058              		.code	16
+ 1059              		.thumb_func
+ 1061              	cmd_set_btr:
+ 1062              	.LFB67:
+ 1063              		.cfi_startproc
+ 1064              		@ args = 0, pretend = 0, frame = 0
+ 1065              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1066 0000 10B5     		push	{r4, lr}
+ 1067              	.LCFI22:
+ 1068              		.cfi_def_cfa_offset 8
+ 1069              		.cfi_offset 4, -8
+ 1070              		.cfi_offset 14, -4
+ 1071 0002 FFF7FEFF 		bl	cmd_timestamp
+ 1072              		@ sp needed
+ 1073 0006 10BD     		pop	{r4, pc}
+ 1074              		.cfi_endproc
+ 1075              	.LFE67:
+ 1077              		.section	.text.hex2int,"ax",%progbits
+ 1078              		.align	2
+ 1079              		.global	hex2int
+ 1080              		.code	16
+ 1081              		.thumb_func
+ 1083              	hex2int:
+ 1084              	.LFB59:
+ 349:Src/slcan_port/slcan.c ****     uint32_t val = 0,i=0;
+ 1085              		.loc 1 349 0
+ 1086              		.cfi_startproc
+ 1087              		@ args = 0, pretend = 0, frame = 0
+ 1088              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1089              	.LVL93:
+ 349:Src/slcan_port/slcan.c ****     uint32_t val = 0,i=0;
+ 1090              		.loc 1 349 0
+ 1091 0000 70B5     		push	{r4, r5, r6, lr}
+ 1092              	.LCFI23:
+ 1093              		.cfi_def_cfa_offset 16
+ 1094              		.cfi_offset 4, -16
+ 1095              		.cfi_offset 5, -12
+ 1096              		.cfi_offset 6, -8
+ 1097              		.cfi_offset 14, -4
+ 351:Src/slcan_port/slcan.c ****         // get current character then increment
+ 1098              		.loc 1 351 0
+ 1099 0002 0029     		cmp	r1, #0
+ 1100 0004 23D0     		beq	.L72
+ARM GAS  /tmp/ccTu2vyu.s 			page 29
+
+
+ 1101 0006 0478     		ldrb	r4, [r0]
+ 1102 0008 002C     		cmp	r4, #0
+ 1103 000a 25D0     		beq	.L76
+ 1104 000c 0026     		movs	r6, #0
+ 1105 000e 0025     		movs	r5, #0
+ 1106 0010 08E0     		b	.L75
+ 1107              	.LVL94:
+ 1108              	.L83:
+ 1109              	.LBB96:
+ 356:Src/slcan_port/slcan.c ****         else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;   
+ 1110              		.loc 1 356 0 discriminator 1
+ 1111 0012 573C     		subs	r4, r4, #87
+ 1112              	.LVL95:
+ 1113 0014 E3B2     		uxtb	r3, r4
+ 1114              	.LVL96:
+ 1115              	.L73:
+ 360:Src/slcan_port/slcan.c ****     }
+ 1116              		.loc 1 360 0
+ 1117 0016 2D01     		lsls	r5, r5, #4
+ 1118              	.LVL97:
+ 1119 0018 1D43     		orrs	r5, r3
+ 1120              	.LVL98:
+ 1121              	.LBE96:
+ 351:Src/slcan_port/slcan.c ****         // get current character then increment
+ 1122              		.loc 1 351 0
+ 1123 001a 8E42     		cmp	r6, r1
+ 1124 001c 16D2     		bcs	.L78
+ 1125              	.L84:
+ 351:Src/slcan_port/slcan.c ****         // get current character then increment
+ 1126              		.loc 1 351 0 is_stmt 0 discriminator 1
+ 1127 001e 845D     		ldrb	r4, [r0, r6]
+ 1128 0020 002C     		cmp	r4, #0
+ 1129 0022 13D0     		beq	.L78
+ 1130              	.LVL99:
+ 1131              	.L75:
+ 1132              	.LBB97:
+ 355:Src/slcan_port/slcan.c ****         else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+ 1133              		.loc 1 355 0 is_stmt 1
+ 1134 0024 2200     		movs	r2, r4
+ 1135 0026 303A     		subs	r2, r2, #48
+ 1136 0028 D3B2     		uxtb	r3, r2
+ 353:Src/slcan_port/slcan.c ****         // transform hex character to the 4bit equivalent number, using the ascii table indexes
+ 1137              		.loc 1 353 0
+ 1138 002a 0136     		adds	r6, r6, #1
+ 1139              	.LVL100:
+ 355:Src/slcan_port/slcan.c ****         else if (byte >= 'a' && byte <='f') byte = byte - 'a' + 10;
+ 1140              		.loc 1 355 0
+ 1141 002c 092B     		cmp	r3, #9
+ 1142 002e F2D9     		bls	.L73
+ 356:Src/slcan_port/slcan.c ****         else if (byte >= 'A' && byte <='F') byte = byte - 'A' + 10;   
+ 1143              		.loc 1 356 0
+ 1144 0030 2300     		movs	r3, r4
+ 1145 0032 613B     		subs	r3, r3, #97
+ 1146 0034 052B     		cmp	r3, #5
+ 1147 0036 ECD9     		bls	.L83
+ 357:Src/slcan_port/slcan.c **** 		else return -1; 
+ 1148              		.loc 1 357 0
+ARM GAS  /tmp/ccTu2vyu.s 			page 30
+
+
+ 1149 0038 2300     		movs	r3, r4
+ 1150 003a 413B     		subs	r3, r3, #65
+ 1151 003c 052B     		cmp	r3, #5
+ 1152 003e 08D8     		bhi	.L77
+ 357:Src/slcan_port/slcan.c **** 		else return -1; 
+ 1153              		.loc 1 357 0 is_stmt 0 discriminator 1
+ 1154 0040 373C     		subs	r4, r4, #55
+ 1155              	.LVL101:
+ 1156 0042 E3B2     		uxtb	r3, r4
+ 1157              	.LVL102:
+ 360:Src/slcan_port/slcan.c ****     }
+ 1158              		.loc 1 360 0 is_stmt 1 discriminator 1
+ 1159 0044 2D01     		lsls	r5, r5, #4
+ 1160              	.LVL103:
+ 1161 0046 1D43     		orrs	r5, r3
+ 1162              	.LVL104:
+ 1163              	.LBE97:
+ 351:Src/slcan_port/slcan.c ****         // get current character then increment
+ 1164              		.loc 1 351 0 discriminator 1
+ 1165 0048 8E42     		cmp	r6, r1
+ 1166 004a E8D3     		bcc	.L84
+ 1167              	.L78:
+ 1168              	.LBB98:
+ 360:Src/slcan_port/slcan.c ****     }
+ 1169              		.loc 1 360 0
+ 1170 004c 2900     		movs	r1, r5
+ 1171              	.LVL105:
+ 1172              	.L72:
+ 1173              	.LBE98:
+ 363:Src/slcan_port/slcan.c **** 
+ 1174              		.loc 1 363 0
+ 1175 004e 0800     		movs	r0, r1
+ 1176              	.LVL106:
+ 1177              		@ sp needed
+ 1178 0050 70BD     		pop	{r4, r5, r6, pc}
+ 1179              	.LVL107:
+ 1180              	.L77:
+ 1181              	.LBB99:
+ 358:Src/slcan_port/slcan.c ****         // shift 4 to make space for new digit, and add the 4 bits of the new digit 
+ 1182              		.loc 1 358 0
+ 1183 0052 0121     		movs	r1, #1
+ 1184              	.LVL108:
+ 1185 0054 4942     		rsbs	r1, r1, #0
+ 1186 0056 FAE7     		b	.L72
+ 1187              	.LVL109:
+ 1188              	.L76:
+ 1189              	.LBE99:
+ 350:Src/slcan_port/slcan.c ****     while (i<len && hex[i] ) {
+ 1190              		.loc 1 350 0
+ 1191 0058 0021     		movs	r1, #0
+ 1192              	.LVL110:
+ 1193 005a F8E7     		b	.L72
+ 1194              		.cfi_endproc
+ 1195              	.LFE59:
+ 1197              		.section	.text.cmd_set_bitrate,"ax",%progbits
+ 1198              		.align	2
+ 1199              		.global	cmd_set_bitrate
+ARM GAS  /tmp/ccTu2vyu.s 			page 31
+
+
+ 1200              		.code	16
+ 1201              		.thumb_func
+ 1203              	cmd_set_bitrate:
+ 1204              	.LFB46:
+ 116:Src/slcan_port/slcan.c **** 	uint8_t res_code=CMD_CR;
+ 1205              		.loc 1 116 0
+ 1206              		.cfi_startproc
+ 1207              		@ args = 0, pretend = 0, frame = 8
+ 1208              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1209              	.LVL111:
+ 1210 0000 10B5     		push	{r4, lr}
+ 1211              	.LCFI24:
+ 1212              		.cfi_def_cfa_offset 8
+ 1213              		.cfi_offset 4, -8
+ 1214              		.cfi_offset 14, -4
+ 1215 0002 82B0     		sub	sp, sp, #8
+ 1216              	.LCFI25:
+ 1217              		.cfi_def_cfa_offset 16
+ 117:Src/slcan_port/slcan.c **** 	SetupBitrate_def *p = (SetupBitrate_def*)cmd;
+ 1218              		.loc 1 117 0
+ 1219 0004 0D23     		movs	r3, #13
+ 1220 0006 6A46     		mov	r2, sp
+ 119:Src/slcan_port/slcan.c **** 		hcan.Init.Prescaler = bitrate_map[hex2int(&(p->speed),1)];
+ 1221              		.loc 1 119 0
+ 1222 0008 0E4C     		ldr	r4, .L92
+ 117:Src/slcan_port/slcan.c **** 	SetupBitrate_def *p = (SetupBitrate_def*)cmd;
+ 1223              		.loc 1 117 0
+ 1224 000a D371     		strb	r3, [r2, #7]
+ 1225              	.LVL112:
+ 119:Src/slcan_port/slcan.c **** 		hcan.Init.Prescaler = bitrate_map[hex2int(&(p->speed),1)];
+ 1226              		.loc 1 119 0
+ 1227 000c 1333     		adds	r3, r3, #19
+ 1228 000e E35C     		ldrb	r3, [r4, r3]
+ 1229 0010 012B     		cmp	r3, #1
+ 1230 0012 09D0     		beq	.L91
+ 1231              	.LVL113:
+ 1232              	.L86:
+ 123:Src/slcan_port/slcan.c **** 		}
+ 1233              		.loc 1 123 0
+ 1234 0014 0723     		movs	r3, #7
+ 1235 0016 6A46     		mov	r2, sp
+ 1236 0018 D371     		strb	r3, [r2, #7]
+ 1237              	.L87:
+ 128:Src/slcan_port/slcan.c **** }
+ 1238              		.loc 1 128 0
+ 1239 001a 6B46     		mov	r3, sp
+ 1240 001c 0121     		movs	r1, #1
+ 1241 001e D81D     		adds	r0, r3, #7
+ 1242 0020 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1243              	.LVL114:
+ 129:Src/slcan_port/slcan.c **** 
+ 1244              		.loc 1 129 0
+ 1245 0024 02B0     		add	sp, sp, #8
+ 1246              		@ sp needed
+ 1247 0026 10BD     		pop	{r4, pc}
+ 1248              	.LVL115:
+ 1249              	.L91:
+ARM GAS  /tmp/ccTu2vyu.s 			page 32
+
+
+ 120:Src/slcan_port/slcan.c **** 		if (HAL_CAN_Init(&hcan) != HAL_OK)
+ 1250              		.loc 1 120 0
+ 1251 0028 0130     		adds	r0, r0, #1
+ 1252              	.LVL116:
+ 1253 002a 0121     		movs	r1, #1
+ 1254 002c FFF7FEFF 		bl	hex2int
+ 1255              	.LVL117:
+ 1256 0030 054B     		ldr	r3, .L92+4
+ 1257 0032 8000     		lsls	r0, r0, #2
+ 1258 0034 C358     		ldr	r3, [r0, r3]
+ 121:Src/slcan_port/slcan.c **** 		{
+ 1259              		.loc 1 121 0
+ 1260 0036 2000     		movs	r0, r4
+ 120:Src/slcan_port/slcan.c **** 		if (HAL_CAN_Init(&hcan) != HAL_OK)
+ 1261              		.loc 1 120 0
+ 1262 0038 6360     		str	r3, [r4, #4]
+ 121:Src/slcan_port/slcan.c **** 		{
+ 1263              		.loc 1 121 0
+ 1264 003a FFF7FEFF 		bl	HAL_CAN_Init
+ 1265              	.LVL118:
+ 1266 003e 0028     		cmp	r0, #0
+ 1267 0040 EBD0     		beq	.L87
+ 1268 0042 E7E7     		b	.L86
+ 1269              	.L93:
+ 1270              		.align	2
+ 1271              	.L92:
+ 1272 0044 00000000 		.word	hcan
+ 1273 0048 00000000 		.word	.LANCHOR1
+ 1274              		.cfi_endproc
+ 1275              	.LFE46:
+ 1277              		.section	.text.cmd_sff,"ax",%progbits
+ 1278              		.align	2
+ 1279              		.global	cmd_sff
+ 1280              		.code	16
+ 1281              		.thumb_func
+ 1283              	cmd_sff:
+ 1284              	.LFB53:
+ 188:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 1285              		.loc 1 188 0
+ 1286              		.cfi_startproc
+ 1287              		@ args = 0, pretend = 0, frame = 40
+ 1288              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1289              	.LVL119:
+ 1290 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1291              	.LCFI26:
+ 1292              		.cfi_def_cfa_offset 20
+ 1293              		.cfi_offset 4, -20
+ 1294              		.cfi_offset 5, -16
+ 1295              		.cfi_offset 6, -12
+ 1296              		.cfi_offset 7, -8
+ 1297              		.cfi_offset 14, -4
+ 1298 0002 0600     		movs	r6, r0
+ 1299 0004 8BB0     		sub	sp, sp, #44
+ 1300              	.LCFI27:
+ 1301              		.cfi_def_cfa_offset 64
+ 189:Src/slcan_port/slcan.c **** 	uint8_t i;
+ 1302              		.loc 1 189 0
+ARM GAS  /tmp/ccTu2vyu.s 			page 33
+
+
+ 1303 0006 02AD     		add	r5, sp, #8
+ 1304 0008 0822     		movs	r2, #8
+ 1305 000a 0021     		movs	r1, #0
+ 1306 000c 2800     		movs	r0, r5
+ 1307              	.LVL120:
+ 1308 000e FFF7FEFF 		bl	memset
+ 1309              	.LVL121:
+ 195:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 1310              		.loc 1 195 0
+ 1311 0012 701C     		adds	r0, r6, #1
+ 1312 0014 0321     		movs	r1, #3
+ 1313 0016 FFF7FEFF 		bl	hex2int
+ 1314              	.LVL122:
+ 196:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 1315              		.loc 1 196 0
+ 1316 001a 0121     		movs	r1, #1
+ 195:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 1317              		.loc 1 195 0
+ 1318 001c 0490     		str	r0, [sp, #16]
+ 196:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 1319              		.loc 1 196 0
+ 1320 001e 301D     		adds	r0, r6, #4
+ 1321 0020 FFF7FEFF 		bl	hex2int
+ 1322              	.LVL123:
+ 197:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_DATA;
+ 1323              		.loc 1 197 0
+ 1324 0024 0023     		movs	r3, #0
+ 196:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 1325              		.loc 1 196 0
+ 1326 0026 0700     		movs	r7, r0
+ 1327 0028 0890     		str	r0, [sp, #32]
+ 197:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_DATA;
+ 1328              		.loc 1 197 0
+ 1329 002a 0693     		str	r3, [sp, #24]
+ 198:Src/slcan_port/slcan.c **** 	for(i=0;i<can_tx_header.DLC;i++){
+ 1330              		.loc 1 198 0
+ 1331 002c 0793     		str	r3, [sp, #28]
+ 1332              	.LVL124:
+ 1333 002e 0536     		adds	r6, r6, #5
+ 1334              	.LVL125:
+ 199:Src/slcan_port/slcan.c **** 		can_data[i] = hex2int(p->data+(i<<1),2);
+ 1335              		.loc 1 199 0
+ 1336 0030 0024     		movs	r4, #0
+ 1337 0032 0028     		cmp	r0, #0
+ 1338 0034 09D0     		beq	.L99
+ 1339              	.LVL126:
+ 1340              	.L101:
+ 200:Src/slcan_port/slcan.c **** 	}
+ 1341              		.loc 1 200 0 discriminator 3
+ 1342 0036 6000     		lsls	r0, r4, #1
+ 1343 0038 3018     		adds	r0, r6, r0
+ 1344 003a 0221     		movs	r1, #2
+ 1345 003c FFF7FEFF 		bl	hex2int
+ 1346              	.LVL127:
+ 1347 0040 2855     		strb	r0, [r5, r4]
+ 199:Src/slcan_port/slcan.c **** 		can_data[i] = hex2int(p->data+(i<<1),2);
+ 1348              		.loc 1 199 0 discriminator 3
+ARM GAS  /tmp/ccTu2vyu.s 			page 34
+
+
+ 1349 0042 0134     		adds	r4, r4, #1
+ 1350              	.LVL128:
+ 1351 0044 E4B2     		uxtb	r4, r4
+ 1352              	.LVL129:
+ 1353 0046 A742     		cmp	r7, r4
+ 1354 0048 F5D8     		bhi	.L101
+ 1355              	.LVL130:
+ 1356              	.L99:
+ 202:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ 1357              		.loc 1 202 0
+ 1358 004a 01AB     		add	r3, sp, #4
+ 1359 004c 2A00     		movs	r2, r5
+ 1360 004e 04A9     		add	r1, sp, #16
+ 1361 0050 0848     		ldr	r0, .L106
+ 1362 0052 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 1363              	.LVL131:
+ 1364 0056 0028     		cmp	r0, #0
+ 1365 0058 08D0     		beq	.L105
+ 206:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1366              		.loc 1 206 0
+ 1367 005a 0723     		movs	r3, #7
+ 1368 005c 6A46     		mov	r2, sp
+ 207:Src/slcan_port/slcan.c **** 	}
+ 1369              		.loc 1 207 0
+ 1370 005e 0121     		movs	r1, #1
+ 1371 0060 6846     		mov	r0, sp
+ 206:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1372              		.loc 1 206 0
+ 1373 0062 1370     		strb	r3, [r2]
+ 207:Src/slcan_port/slcan.c **** 	}
+ 1374              		.loc 1 207 0
+ 1375 0064 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1376              	.LVL132:
+ 1377              	.L94:
+ 209:Src/slcan_port/slcan.c **** 
+ 1378              		.loc 1 209 0
+ 1379 0068 0BB0     		add	sp, sp, #44
+ 1380              		@ sp needed
+ 1381              	.LVL133:
+ 1382 006a F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1383              	.L105:
+ 1384 006c FFF7FEFF 		bl	cmd_sff.part.0
+ 1385              	.LVL134:
+ 1386 0070 FAE7     		b	.L94
+ 1387              	.L107:
+ 1388 0072 C046     		.align	2
+ 1389              	.L106:
+ 1390 0074 00000000 		.word	hcan
+ 1391              		.cfi_endproc
+ 1392              	.LFE53:
+ 1394              		.section	.text.cmd_eff,"ax",%progbits
+ 1395              		.align	2
+ 1396              		.global	cmd_eff
+ 1397              		.code	16
+ 1398              		.thumb_func
+ 1400              	cmd_eff:
+ 1401              	.LFB54:
+ARM GAS  /tmp/ccTu2vyu.s 			page 35
+
+
+ 212:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 1402              		.loc 1 212 0
+ 1403              		.cfi_startproc
+ 1404              		@ args = 0, pretend = 0, frame = 40
+ 1405              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1406              	.LVL135:
+ 1407 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1408              	.LCFI28:
+ 1409              		.cfi_def_cfa_offset 20
+ 1410              		.cfi_offset 4, -20
+ 1411              		.cfi_offset 5, -16
+ 1412              		.cfi_offset 6, -12
+ 1413              		.cfi_offset 7, -8
+ 1414              		.cfi_offset 14, -4
+ 1415 0002 0600     		movs	r6, r0
+ 1416 0004 8BB0     		sub	sp, sp, #44
+ 1417              	.LCFI29:
+ 1418              		.cfi_def_cfa_offset 64
+ 213:Src/slcan_port/slcan.c **** 	uint8_t i;
+ 1419              		.loc 1 213 0
+ 1420 0006 02AD     		add	r5, sp, #8
+ 1421 0008 0822     		movs	r2, #8
+ 1422 000a 0021     		movs	r1, #0
+ 1423 000c 2800     		movs	r0, r5
+ 1424              	.LVL136:
+ 1425 000e FFF7FEFF 		bl	memset
+ 1426              	.LVL137:
+ 219:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 1427              		.loc 1 219 0
+ 1428 0012 701C     		adds	r0, r6, #1
+ 1429 0014 0821     		movs	r1, #8
+ 1430 0016 FFF7FEFF 		bl	hex2int
+ 1431              	.LVL138:
+ 1432 001a 0590     		str	r0, [sp, #20]
+ 220:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_EXT;
+ 1433              		.loc 1 220 0
+ 1434 001c 3000     		movs	r0, r6
+ 1435 001e 0121     		movs	r1, #1
+ 1436 0020 0930     		adds	r0, r0, #9
+ 1437 0022 FFF7FEFF 		bl	hex2int
+ 1438              	.LVL139:
+ 221:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_DATA;
+ 1439              		.loc 1 221 0
+ 1440 0026 0423     		movs	r3, #4
+ 1441 0028 0693     		str	r3, [sp, #24]
+ 222:Src/slcan_port/slcan.c **** 	for(i=0;i<can_tx_header.DLC;i++){
+ 1442              		.loc 1 222 0
+ 1443 002a 0023     		movs	r3, #0
+ 220:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_EXT;
+ 1444              		.loc 1 220 0
+ 1445 002c 0700     		movs	r7, r0
+ 1446 002e 0890     		str	r0, [sp, #32]
+ 222:Src/slcan_port/slcan.c **** 	for(i=0;i<can_tx_header.DLC;i++){
+ 1447              		.loc 1 222 0
+ 1448 0030 0793     		str	r3, [sp, #28]
+ 1449              	.LVL140:
+ 1450 0032 0A36     		adds	r6, r6, #10
+ARM GAS  /tmp/ccTu2vyu.s 			page 36
+
+
+ 1451              	.LVL141:
+ 223:Src/slcan_port/slcan.c **** 		can_data[i] = hex2int(p->data+(i<<1),2);
+ 1452              		.loc 1 223 0
+ 1453 0034 0024     		movs	r4, #0
+ 1454 0036 0028     		cmp	r0, #0
+ 1455 0038 09D0     		beq	.L113
+ 1456              	.LVL142:
+ 1457              	.L115:
+ 224:Src/slcan_port/slcan.c **** 	}
+ 1458              		.loc 1 224 0 discriminator 3
+ 1459 003a 6000     		lsls	r0, r4, #1
+ 1460 003c 3018     		adds	r0, r6, r0
+ 1461 003e 0221     		movs	r1, #2
+ 1462 0040 FFF7FEFF 		bl	hex2int
+ 1463              	.LVL143:
+ 1464 0044 2855     		strb	r0, [r5, r4]
+ 223:Src/slcan_port/slcan.c **** 		can_data[i] = hex2int(p->data+(i<<1),2);
+ 1465              		.loc 1 223 0 discriminator 3
+ 1466 0046 0134     		adds	r4, r4, #1
+ 1467              	.LVL144:
+ 1468 0048 E4B2     		uxtb	r4, r4
+ 1469              	.LVL145:
+ 1470 004a A742     		cmp	r7, r4
+ 1471 004c F5D8     		bhi	.L115
+ 1472              	.LVL146:
+ 1473              	.L113:
+ 226:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ 1474              		.loc 1 226 0
+ 1475 004e 01AB     		add	r3, sp, #4
+ 1476 0050 2A00     		movs	r2, r5
+ 1477 0052 04A9     		add	r1, sp, #16
+ 1478 0054 0848     		ldr	r0, .L120
+ 1479 0056 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 1480              	.LVL147:
+ 1481 005a 0028     		cmp	r0, #0
+ 1482 005c 08D0     		beq	.L119
+ 230:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1483              		.loc 1 230 0
+ 1484 005e 0723     		movs	r3, #7
+ 1485 0060 6A46     		mov	r2, sp
+ 231:Src/slcan_port/slcan.c **** 	}
+ 1486              		.loc 1 231 0
+ 1487 0062 0121     		movs	r1, #1
+ 1488 0064 6846     		mov	r0, sp
+ 230:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1489              		.loc 1 230 0
+ 1490 0066 1370     		strb	r3, [r2]
+ 231:Src/slcan_port/slcan.c **** 	}
+ 1491              		.loc 1 231 0
+ 1492 0068 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1493              	.LVL148:
+ 1494              	.L108:
+ 233:Src/slcan_port/slcan.c **** 
+ 1495              		.loc 1 233 0
+ 1496 006c 0BB0     		add	sp, sp, #44
+ 1497              		@ sp needed
+ 1498              	.LVL149:
+ARM GAS  /tmp/ccTu2vyu.s 			page 37
+
+
+ 1499 006e F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1500              	.L119:
+ 1501 0070 FFF7FEFF 		bl	cmd_eff.part.1
+ 1502              	.LVL150:
+ 1503 0074 FAE7     		b	.L108
+ 1504              	.L121:
+ 1505 0076 C046     		.align	2
+ 1506              	.L120:
+ 1507 0078 00000000 		.word	hcan
+ 1508              		.cfi_endproc
+ 1509              	.LFE54:
+ 1511              		.section	.text.cmd_rsff,"ax",%progbits
+ 1512              		.align	2
+ 1513              		.global	cmd_rsff
+ 1514              		.code	16
+ 1515              		.thumb_func
+ 1517              	cmd_rsff:
+ 1518              	.LFB55:
+ 236:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 1519              		.loc 1 236 0
+ 1520              		.cfi_startproc
+ 1521              		@ args = 0, pretend = 0, frame = 40
+ 1522              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1523              	.LVL151:
+ 1524 0000 10B5     		push	{r4, lr}
+ 1525              	.LCFI30:
+ 1526              		.cfi_def_cfa_offset 8
+ 1527              		.cfi_offset 4, -8
+ 1528              		.cfi_offset 14, -4
+ 1529 0002 0400     		movs	r4, r0
+ 1530 0004 8AB0     		sub	sp, sp, #40
+ 1531              	.LCFI31:
+ 1532              		.cfi_def_cfa_offset 48
+ 237:Src/slcan_port/slcan.c **** 	uint32_t mailbox;
+ 1533              		.loc 1 237 0
+ 1534 0006 0822     		movs	r2, #8
+ 1535 0008 0021     		movs	r1, #0
+ 1536 000a 02A8     		add	r0, sp, #8
+ 1537              	.LVL152:
+ 1538 000c FFF7FEFF 		bl	memset
+ 1539              	.LVL153:
+ 242:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 1540              		.loc 1 242 0
+ 1541 0010 0321     		movs	r1, #3
+ 1542 0012 601C     		adds	r0, r4, #1
+ 1543 0014 FFF7FEFF 		bl	hex2int
+ 1544              	.LVL154:
+ 243:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 1545              		.loc 1 243 0
+ 1546 0018 0121     		movs	r1, #1
+ 242:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 1547              		.loc 1 242 0
+ 1548 001a 0490     		str	r0, [sp, #16]
+ 243:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 1549              		.loc 1 243 0
+ 1550 001c 201D     		adds	r0, r4, #4
+ 1551 001e FFF7FEFF 		bl	hex2int
+ARM GAS  /tmp/ccTu2vyu.s 			page 38
+
+
+ 1552              	.LVL155:
+ 244:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_REMOTE;
+ 1553              		.loc 1 244 0
+ 1554 0022 0023     		movs	r3, #0
+ 1555 0024 0693     		str	r3, [sp, #24]
+ 245:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 1556              		.loc 1 245 0
+ 1557 0026 0233     		adds	r3, r3, #2
+ 243:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_STD;
+ 1558              		.loc 1 243 0
+ 1559 0028 0890     		str	r0, [sp, #32]
+ 245:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 1560              		.loc 1 245 0
+ 1561 002a 0793     		str	r3, [sp, #28]
+ 246:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ 1562              		.loc 1 246 0
+ 1563 002c 02AA     		add	r2, sp, #8
+ 1564 002e 01AB     		add	r3, sp, #4
+ 1565 0030 04A9     		add	r1, sp, #16
+ 1566 0032 0848     		ldr	r0, .L126
+ 1567 0034 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 1568              	.LVL156:
+ 1569 0038 0028     		cmp	r0, #0
+ 1570 003a 08D0     		beq	.L125
+ 250:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1571              		.loc 1 250 0
+ 1572 003c 0723     		movs	r3, #7
+ 1573 003e 6A46     		mov	r2, sp
+ 251:Src/slcan_port/slcan.c **** 	}
+ 1574              		.loc 1 251 0
+ 1575 0040 0121     		movs	r1, #1
+ 1576 0042 6846     		mov	r0, sp
+ 250:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1577              		.loc 1 250 0
+ 1578 0044 1370     		strb	r3, [r2]
+ 251:Src/slcan_port/slcan.c **** 	}
+ 1579              		.loc 1 251 0
+ 1580 0046 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1581              	.LVL157:
+ 1582              	.L122:
+ 253:Src/slcan_port/slcan.c **** 
+ 1583              		.loc 1 253 0
+ 1584 004a 0AB0     		add	sp, sp, #40
+ 1585              		@ sp needed
+ 1586              	.LVL158:
+ 1587 004c 10BD     		pop	{r4, pc}
+ 1588              	.LVL159:
+ 1589              	.L125:
+ 1590 004e FFF7FEFF 		bl	cmd_rsff.part.2
+ 1591              	.LVL160:
+ 1592 0052 FAE7     		b	.L122
+ 1593              	.L127:
+ 1594              		.align	2
+ 1595              	.L126:
+ 1596 0054 00000000 		.word	hcan
+ 1597              		.cfi_endproc
+ 1598              	.LFE55:
+ARM GAS  /tmp/ccTu2vyu.s 			page 39
+
+
+ 1600              		.section	.text.cmd_reff,"ax",%progbits
+ 1601              		.align	2
+ 1602              		.global	cmd_reff
+ 1603              		.code	16
+ 1604              		.thumb_func
+ 1606              	cmd_reff:
+ 1607              	.LFB56:
+ 256:Src/slcan_port/slcan.c **** 	uint8_t can_data[8]={0};
+ 1608              		.loc 1 256 0
+ 1609              		.cfi_startproc
+ 1610              		@ args = 0, pretend = 0, frame = 40
+ 1611              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1612              	.LVL161:
+ 1613 0000 10B5     		push	{r4, lr}
+ 1614              	.LCFI32:
+ 1615              		.cfi_def_cfa_offset 8
+ 1616              		.cfi_offset 4, -8
+ 1617              		.cfi_offset 14, -4
+ 1618 0002 0400     		movs	r4, r0
+ 1619 0004 8AB0     		sub	sp, sp, #40
+ 1620              	.LCFI33:
+ 1621              		.cfi_def_cfa_offset 48
+ 257:Src/slcan_port/slcan.c **** 	uint32_t mailbox;
+ 1622              		.loc 1 257 0
+ 1623 0006 0822     		movs	r2, #8
+ 1624 0008 0021     		movs	r1, #0
+ 1625 000a 02A8     		add	r0, sp, #8
+ 1626              	.LVL162:
+ 1627 000c FFF7FEFF 		bl	memset
+ 1628              	.LVL163:
+ 262:Src/slcan_port/slcan.c **** 	can_tx_header.DLC = hex2int(&p->len,1);
+ 1629              		.loc 1 262 0
+ 1630 0010 0821     		movs	r1, #8
+ 1631 0012 601C     		adds	r0, r4, #1
+ 1632 0014 FFF7FEFF 		bl	hex2int
+ 1633              	.LVL164:
+ 1634 0018 0590     		str	r0, [sp, #20]
+ 263:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_EXT;
+ 1635              		.loc 1 263 0
+ 1636 001a 2000     		movs	r0, r4
+ 1637 001c 0121     		movs	r1, #1
+ 1638 001e 0930     		adds	r0, r0, #9
+ 1639 0020 FFF7FEFF 		bl	hex2int
+ 1640              	.LVL165:
+ 264:Src/slcan_port/slcan.c **** 	can_tx_header.RTR = CAN_RTR_REMOTE;
+ 1641              		.loc 1 264 0
+ 1642 0024 0423     		movs	r3, #4
+ 1643 0026 0693     		str	r3, [sp, #24]
+ 265:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 1644              		.loc 1 265 0
+ 1645 0028 023B     		subs	r3, r3, #2
+ 263:Src/slcan_port/slcan.c **** 	can_tx_header.IDE = CAN_ID_EXT;
+ 1646              		.loc 1 263 0
+ 1647 002a 0890     		str	r0, [sp, #32]
+ 265:Src/slcan_port/slcan.c **** 	if(HAL_CAN_AddTxMessage(&hcan,&can_tx_header,can_data,&mailbox) == HAL_OK){
+ 1648              		.loc 1 265 0
+ 1649 002c 0793     		str	r3, [sp, #28]
+ARM GAS  /tmp/ccTu2vyu.s 			page 40
+
+
+ 266:Src/slcan_port/slcan.c **** 		cmd_response("z\r",2);
+ 1650              		.loc 1 266 0
+ 1651 002e 02AA     		add	r2, sp, #8
+ 1652 0030 01AB     		add	r3, sp, #4
+ 1653 0032 04A9     		add	r1, sp, #16
+ 1654 0034 0848     		ldr	r0, .L132
+ 1655 0036 FFF7FEFF 		bl	HAL_CAN_AddTxMessage
+ 1656              	.LVL166:
+ 1657 003a 0028     		cmp	r0, #0
+ 1658 003c 08D0     		beq	.L131
+ 270:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1659              		.loc 1 270 0
+ 1660 003e 0723     		movs	r3, #7
+ 1661 0040 6A46     		mov	r2, sp
+ 271:Src/slcan_port/slcan.c **** 	}
+ 1662              		.loc 1 271 0
+ 1663 0042 0121     		movs	r1, #1
+ 1664 0044 6846     		mov	r0, sp
+ 270:Src/slcan_port/slcan.c **** 		cmd_response(res_code,1);
+ 1665              		.loc 1 270 0
+ 1666 0046 1370     		strb	r3, [r2]
+ 271:Src/slcan_port/slcan.c **** 	}
+ 1667              		.loc 1 271 0
+ 1668 0048 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1669              	.LVL167:
+ 1670              	.L128:
+ 273:Src/slcan_port/slcan.c **** 
+ 1671              		.loc 1 273 0
+ 1672 004c 0AB0     		add	sp, sp, #40
+ 1673              		@ sp needed
+ 1674              	.LVL168:
+ 1675 004e 10BD     		pop	{r4, pc}
+ 1676              	.LVL169:
+ 1677              	.L131:
+ 1678 0050 FFF7FEFF 		bl	cmd_reff.part.3
+ 1679              	.LVL170:
+ 1680 0054 FAE7     		b	.L128
+ 1681              	.L133:
+ 1682 0056 C046     		.align	2
+ 1683              	.L132:
+ 1684 0058 00000000 		.word	hcan
+ 1685              		.cfi_endproc
+ 1686              	.LFE56:
+ 1688              		.section	.text.slcan_cmd_task,"ax",%progbits
+ 1689              		.align	2
+ 1690              		.global	slcan_cmd_task
+ 1691              		.code	16
+ 1692              		.thumb_func
+ 1694              	slcan_cmd_task:
+ 1695              	.LFB57:
+ 276:Src/slcan_port/slcan.c **** 	//printf("cmd:%s\n",cmd);
+ 1696              		.loc 1 276 0
+ 1697              		.cfi_startproc
+ 1698              		@ args = 0, pretend = 0, frame = 0
+ 1699              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1700              	.LVL171:
+ 1701 0000 10B5     		push	{r4, lr}
+ARM GAS  /tmp/ccTu2vyu.s 			page 41
+
+
+ 1702              	.LCFI34:
+ 1703              		.cfi_def_cfa_offset 8
+ 1704              		.cfi_offset 4, -8
+ 1705              		.cfi_offset 14, -4
+ 278:Src/slcan_port/slcan.c **** 	{
+ 1706              		.loc 1 278 0
+ 1707 0002 0378     		ldrb	r3, [r0]
+ 1708 0004 433B     		subs	r3, r3, #67
+ 1709 0006 DBB2     		uxtb	r3, r3
+ 1710 0008 312B     		cmp	r3, #49
+ 1711 000a 05D8     		bhi	.L135
+ 1712 000c 124A     		ldr	r2, .L148
+ 1713 000e 9B00     		lsls	r3, r3, #2
+ 1714 0010 D358     		ldr	r3, [r2, r3]
+ 1715 0012 9F46     		mov	pc, r3
+ 1716              		.section	.rodata.slcan_cmd_task,"a",%progbits
+ 1717              		.align	2
+ 1718              	.L137:
+ 1719 0000 26000000 		.word	.L136
+ 1720 0004 18000000 		.word	.L135
+ 1721 0008 18000000 		.word	.L135
+ 1722 000c 18000000 		.word	.L135
+ 1723 0010 18000000 		.word	.L135
+ 1724 0014 18000000 		.word	.L135
+ 1725 0018 18000000 		.word	.L135
+ 1726 001c 18000000 		.word	.L135
+ 1727 0020 18000000 		.word	.L135
+ 1728 0024 18000000 		.word	.L135
+ 1729 0028 18000000 		.word	.L135
+ 1730 002c 14000000 		.word	.L138
+ 1731 0030 32000000 		.word	.L139
+ 1732 0034 18000000 		.word	.L135
+ 1733 0038 18000000 		.word	.L135
+ 1734 003c 38000000 		.word	.L140
+ 1735 0040 3E000000 		.word	.L141
+ 1736 0044 44000000 		.word	.L142
+ 1737 0048 18000000 		.word	.L135
+ 1738 004c 4A000000 		.word	.L143
+ 1739 0050 18000000 		.word	.L135
+ 1740 0054 18000000 		.word	.L135
+ 1741 0058 18000000 		.word	.L135
+ 1742 005c 1C000000 		.word	.L144
+ 1743 0060 18000000 		.word	.L135
+ 1744 0064 18000000 		.word	.L135
+ 1745 0068 18000000 		.word	.L135
+ 1746 006c 18000000 		.word	.L135
+ 1747 0070 18000000 		.word	.L135
+ 1748 0074 18000000 		.word	.L135
+ 1749 0078 18000000 		.word	.L135
+ 1750 007c 18000000 		.word	.L135
+ 1751 0080 18000000 		.word	.L135
+ 1752 0084 18000000 		.word	.L135
+ 1753 0088 18000000 		.word	.L135
+ 1754 008c 18000000 		.word	.L135
+ 1755 0090 18000000 		.word	.L135
+ 1756 0094 18000000 		.word	.L135
+ 1757 0098 18000000 		.word	.L135
+ARM GAS  /tmp/ccTu2vyu.s 			page 42
+
+
+ 1758 009c 18000000 		.word	.L135
+ 1759 00a0 18000000 		.word	.L135
+ 1760 00a4 18000000 		.word	.L135
+ 1761 00a8 18000000 		.word	.L135
+ 1762 00ac 18000000 		.word	.L135
+ 1763 00b0 18000000 		.word	.L135
+ 1764 00b4 18000000 		.word	.L135
+ 1765 00b8 18000000 		.word	.L135
+ 1766 00bc 50000000 		.word	.L145
+ 1767 00c0 1C000000 		.word	.L144
+ 1768 00c4 2C000000 		.word	.L147
+ 1769              		.section	.text.slcan_cmd_task
+ 1770              	.L138:
+ 317:Src/slcan_port/slcan.c **** 			break;
+ 1771              		.loc 1 317 0
+ 1772 0014 FFF7FEFF 		bl	cmd_sn
+ 1773              	.LVL172:
+ 1774              	.L135:
+ 324:Src/slcan_port/slcan.c **** 
+ 1775              		.loc 1 324 0
+ 1776 0018 0020     		movs	r0, #0
+ 1777              		@ sp needed
+ 1778 001a 10BD     		pop	{r4, pc}
+ 1779              	.LVL173:
+ 1780              	.L144:
+ 1781              	.LBB100:
+ 1782              	.LBB101:
+ 183:Src/slcan_port/slcan.c **** 	UNUSED(onoff);
+ 1783              		.loc 1 183 0
+ 1784 001c 0121     		movs	r1, #1
+ 1785 001e 0F48     		ldr	r0, .L148+4
+ 1786              	.LVL174:
+ 1787 0020 FFF7FEFF 		bl	CDC_Transmit_FS
+ 1788              	.LVL175:
+ 1789 0024 F8E7     		b	.L135
+ 1790              	.LVL176:
+ 1791              	.L136:
+ 1792              	.LBE101:
+ 1793              	.LBE100:
+ 290:Src/slcan_port/slcan.c **** 			break;
+ 1794              		.loc 1 290 0
+ 1795 0026 FFF7FEFF 		bl	cmd_close
+ 1796              	.LVL177:
+ 291:Src/slcan_port/slcan.c **** 		case CMD_SFF:
+ 1797              		.loc 1 291 0
+ 1798 002a F5E7     		b	.L135
+ 1799              	.LVL178:
+ 1800              	.L147:
+ 293:Src/slcan_port/slcan.c **** 			break;
+ 1801              		.loc 1 293 0
+ 1802 002c FFF7FEFF 		bl	cmd_sff
+ 1803              	.LVL179:
+ 294:Src/slcan_port/slcan.c **** 		case CMD_EFF:
+ 1804              		.loc 1 294 0
+ 1805 0030 F2E7     		b	.L135
+ 1806              	.LVL180:
+ 1807              	.L139:
+ARM GAS  /tmp/ccTu2vyu.s 			page 43
+
+
+ 287:Src/slcan_port/slcan.c **** 			break;
+ 1808              		.loc 1 287 0
+ 1809 0032 FFF7FEFF 		bl	cmd_open
+ 1810              	.LVL181:
+ 288:Src/slcan_port/slcan.c **** 		case CMD_CLOSE:
+ 1811              		.loc 1 288 0
+ 1812 0036 EFE7     		b	.L135
+ 1813              	.LVL182:
+ 1814              	.L140:
+ 302:Src/slcan_port/slcan.c **** 			break;
+ 1815              		.loc 1 302 0
+ 1816 0038 FFF7FEFF 		bl	cmd_reff
+ 1817              	.LVL183:
+ 303:Src/slcan_port/slcan.c **** 		case CMD_RSF:
+ 1818              		.loc 1 303 0
+ 1819 003c ECE7     		b	.L135
+ 1820              	.LVL184:
+ 1821              	.L141:
+ 281:Src/slcan_port/slcan.c **** 			break;
+ 1822              		.loc 1 281 0
+ 1823 003e FFF7FEFF 		bl	cmd_set_bitrate
+ 1824              	.LVL185:
+ 282:Src/slcan_port/slcan.c **** 		case CMD_SET_BTR:
+ 1825              		.loc 1 282 0
+ 1826 0042 E9E7     		b	.L135
+ 1827              	.LVL186:
+ 1828              	.L142:
+ 296:Src/slcan_port/slcan.c **** 			break;
+ 1829              		.loc 1 296 0
+ 1830 0044 FFF7FEFF 		bl	cmd_eff
+ 1831              	.LVL187:
+ 297:Src/slcan_port/slcan.c **** 		case CMD_RSFF:
+ 1832              		.loc 1 297 0
+ 1833 0048 E6E7     		b	.L135
+ 1834              	.LVL188:
+ 1835              	.L143:
+ 314:Src/slcan_port/slcan.c **** 			break;
+ 1836              		.loc 1 314 0
+ 1837 004a FFF7FEFF 		bl	cmd_version
+ 1838              	.LVL189:
+ 315:Src/slcan_port/slcan.c **** 		case CMD_SN:
+ 1839              		.loc 1 315 0
+ 1840 004e E3E7     		b	.L135
+ 1841              	.LVL190:
+ 1842              	.L145:
+ 299:Src/slcan_port/slcan.c **** 			break;
+ 1843              		.loc 1 299 0
+ 1844 0050 FFF7FEFF 		bl	cmd_rsff
+ 1845              	.LVL191:
+ 300:Src/slcan_port/slcan.c **** 		case CMD_REFF:
+ 1846              		.loc 1 300 0
+ 1847 0054 E0E7     		b	.L135
+ 1848              	.L149:
+ 1849 0056 C046     		.align	2
+ 1850              	.L148:
+ 1851 0058 00000000 		.word	.L137
+ 1852 005c 04000000 		.word	.LC11
+ARM GAS  /tmp/ccTu2vyu.s 			page 44
+
+
+ 1853              		.cfi_endproc
+ 1854              	.LFE57:
+ 1856              		.section	.text.slcan_cdc_process,"ax",%progbits
+ 1857              		.align	2
+ 1858              		.global	slcan_cdc_process
+ 1859              		.code	16
+ 1860              		.thumb_func
+ 1862              	slcan_cdc_process:
+ 1863              	.LFB58:
+ 327:Src/slcan_port/slcan.c **** 	char cmd[50] ={0};
+ 1864              		.loc 1 327 0
+ 1865              		.cfi_startproc
+ 1866              		@ args = 0, pretend = 0, frame = 56
+ 1867              		@ frame_needed = 0, uses_anonymous_args = 0
+ 1868              	.LVL192:
+ 1869 0000 F0B5     		push	{r4, r5, r6, r7, lr}
+ 1870              	.LCFI35:
+ 1871              		.cfi_def_cfa_offset 20
+ 1872              		.cfi_offset 4, -20
+ 1873              		.cfi_offset 5, -16
+ 1874              		.cfi_offset 6, -12
+ 1875              		.cfi_offset 7, -8
+ 1876              		.cfi_offset 14, -4
+ 1877 0002 4F46     		mov	r7, r9
+ 1878 0004 4646     		mov	r6, r8
+ 1879 0006 C0B4     		push	{r6, r7}
+ 1880              	.LCFI36:
+ 1881              		.cfi_def_cfa_offset 28
+ 1882              		.cfi_offset 8, -28
+ 1883              		.cfi_offset 9, -24
+ 1884 0008 8FB0     		sub	sp, sp, #60
+ 1885              	.LCFI37:
+ 1886              		.cfi_def_cfa_offset 88
+ 327:Src/slcan_port/slcan.c **** 	char cmd[50] ={0};
+ 1887              		.loc 1 327 0
+ 1888 000a 0F00     		movs	r7, r1
+ 1889 000c 0400     		movs	r4, r0
+ 328:Src/slcan_port/slcan.c **** 	int i = 0;
+ 1890              		.loc 1 328 0
+ 1891 000e 3222     		movs	r2, #50
+ 1892 0010 0021     		movs	r1, #0
+ 1893              	.LVL193:
+ 1894 0012 01A8     		add	r0, sp, #4
+ 1895              	.LVL194:
+ 1896 0014 FFF7FEFF 		bl	memset
+ 1897              	.LVL195:
+ 330:Src/slcan_port/slcan.c **** 		if (cmd_buf_off >= (CMD_BUF_MAX-1)){
+ 1898              		.loc 1 330 0
+ 1899 0018 002F     		cmp	r7, #0
+ 1900 001a 2ADD     		ble	.L158
+ 331:Src/slcan_port/slcan.c **** 			//printf("cmd_buff overflow\n");
+ 1901              		.loc 1 331 0
+ 1902 001c 194E     		ldr	r6, .L162
+ 1903 001e 3568     		ldr	r5, [r6]
+ 1904 0020 302D     		cmp	r5, #48
+ 1905 0022 2CDC     		bgt	.L153
+ 1906 0024 184B     		ldr	r3, .L162+4
+ARM GAS  /tmp/ccTu2vyu.s 			page 45
+
+
+ 1907 0026 013F     		subs	r7, r7, #1
+ 1908              	.LVL196:
+ 1909 0028 9846     		mov	r8, r3
+ 338:Src/slcan_port/slcan.c **** 			cmd_buf_off = 0;
+ 1910              		.loc 1 338 0
+ 1911 002a 0023     		movs	r3, #0
+ 1912 002c E719     		adds	r7, r4, r7
+ 1913              	.LVL197:
+ 1914 002e 9946     		mov	r9, r3
+ 1915 0030 0AE0     		b	.L154
+ 1916              	.LVL198:
+ 1917              	.L155:
+ 343:Src/slcan_port/slcan.c **** 		}
+ 1918              		.loc 1 343 0
+ 1919 0032 4246     		mov	r2, r8
+ 1920 0034 6B1C     		adds	r3, r5, #1
+ 1921 0036 3360     		str	r3, [r6]
+ 1922 0038 2378     		ldrb	r3, [r4]
+ 1923 003a 5355     		strb	r3, [r2, r5]
+ 1924              	.LVL199:
+ 330:Src/slcan_port/slcan.c **** 		if (cmd_buf_off >= (CMD_BUF_MAX-1)){
+ 1925              		.loc 1 330 0
+ 1926 003c BC42     		cmp	r4, r7
+ 1927 003e 18D0     		beq	.L158
+ 1928              	.LVL200:
+ 1929              	.L157:
+ 331:Src/slcan_port/slcan.c **** 			//printf("cmd_buff overflow\n");
+ 1930              		.loc 1 331 0
+ 1931 0040 3568     		ldr	r5, [r6]
+ 1932 0042 0134     		adds	r4, r4, #1
+ 1933 0044 302D     		cmp	r5, #48
+ 1934 0046 1ADC     		bgt	.L153
+ 1935              	.L154:
+ 1936              	.LVL201:
+ 336:Src/slcan_port/slcan.c **** 			memcpy(cmd,cmd_buf,cmd_buf_off);
+ 1937              		.loc 1 336 0
+ 1938 0048 2378     		ldrb	r3, [r4]
+ 1939 004a 0D2B     		cmp	r3, #13
+ 1940 004c F1D1     		bne	.L155
+ 336:Src/slcan_port/slcan.c **** 			memcpy(cmd,cmd_buf,cmd_buf_off);
+ 1941              		.loc 1 336 0 is_stmt 0 discriminator 1
+ 1942 004e 002D     		cmp	r5, #0
+ 1943 0050 EFD0     		beq	.L155
+ 337:Src/slcan_port/slcan.c **** 			cmd[cmd_buf_off] =0;
+ 1944              		.loc 1 337 0 is_stmt 1
+ 1945 0052 2A00     		movs	r2, r5
+ 1946 0054 4146     		mov	r1, r8
+ 1947 0056 01A8     		add	r0, sp, #4
+ 1948 0058 FFF7FEFF 		bl	memcpy
+ 1949              	.LVL202:
+ 338:Src/slcan_port/slcan.c **** 			cmd_buf_off = 0;
+ 1950              		.loc 1 338 0
+ 1951 005c 6B46     		mov	r3, sp
+ 1952 005e 4A46     		mov	r2, r9
+ 1953 0060 0433     		adds	r3, r3, #4
+ 1954 0062 5A55     		strb	r2, [r3, r5]
+ 339:Src/slcan_port/slcan.c **** 			//process it
+ARM GAS  /tmp/ccTu2vyu.s 			page 46
+
+
+ 1955              		.loc 1 339 0
+ 1956 0064 4B46     		mov	r3, r9
+ 341:Src/slcan_port/slcan.c **** 		}else{
+ 1957              		.loc 1 341 0
+ 1958 0066 01A8     		add	r0, sp, #4
+ 339:Src/slcan_port/slcan.c **** 			//process it
+ 1959              		.loc 1 339 0
+ 1960 0068 3360     		str	r3, [r6]
+ 341:Src/slcan_port/slcan.c **** 		}else{
+ 1961              		.loc 1 341 0
+ 1962 006a FFF7FEFF 		bl	slcan_cmd_task
+ 1963              	.LVL203:
+ 330:Src/slcan_port/slcan.c **** 		if (cmd_buf_off >= (CMD_BUF_MAX-1)){
+ 1964              		.loc 1 330 0
+ 1965 006e BC42     		cmp	r4, r7
+ 1966 0070 E6D1     		bne	.L157
+ 1967              	.LVL204:
+ 1968              	.L158:
+ 346:Src/slcan_port/slcan.c **** }
+ 1969              		.loc 1 346 0
+ 1970 0072 0020     		movs	r0, #0
+ 1971              	.L152:
+ 347:Src/slcan_port/slcan.c **** 
+ 1972              		.loc 1 347 0
+ 1973 0074 0FB0     		add	sp, sp, #60
+ 1974              		@ sp needed
+ 1975 0076 0CBC     		pop	{r2, r3}
+ 1976 0078 9046     		mov	r8, r2
+ 1977 007a 9946     		mov	r9, r3
+ 1978 007c F0BD     		pop	{r4, r5, r6, r7, pc}
+ 1979              	.L153:
+ 333:Src/slcan_port/slcan.c **** 		}
+ 1980              		.loc 1 333 0
+ 1981 007e 0120     		movs	r0, #1
+ 1982 0080 4042     		rsbs	r0, r0, #0
+ 1983 0082 F7E7     		b	.L152
+ 1984              	.L163:
+ 1985              		.align	2
+ 1986              	.L162:
+ 1987 0084 00000000 		.word	.LANCHOR2
+ 1988 0088 00000000 		.word	.LANCHOR3
+ 1989              		.cfi_endproc
+ 1990              	.LFE58:
+ 1992              		.section	.text.int2hex,"ax",%progbits
+ 1993              		.align	2
+ 1994              		.global	int2hex
+ 1995              		.code	16
+ 1996              		.thumb_func
+ 1998              	int2hex:
+ 1999              	.LFB60:
+ 365:Src/slcan_port/slcan.c **** 	while(len > 0){
+ 2000              		.loc 1 365 0
+ 2001              		.cfi_startproc
+ 2002              		@ args = 0, pretend = 0, frame = 0
+ 2003              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2004              	.LVL205:
+ 2005 0000 30B5     		push	{r4, r5, lr}
+ARM GAS  /tmp/ccTu2vyu.s 			page 47
+
+
+ 2006              	.LCFI38:
+ 2007              		.cfi_def_cfa_offset 12
+ 2008              		.cfi_offset 4, -12
+ 2009              		.cfi_offset 5, -8
+ 2010              		.cfi_offset 14, -4
+ 366:Src/slcan_port/slcan.c **** 		out[len-1] = hex_str_map[data & 0xf];
+ 2011              		.loc 1 366 0
+ 2012 0002 0029     		cmp	r1, #0
+ 2013 0004 0CDD     		ble	.L164
+ 367:Src/slcan_port/slcan.c **** 		data >>= 4;
+ 2014              		.loc 1 367 0
+ 2015 0006 0F24     		movs	r4, #15
+ 2016 0008 0139     		subs	r1, r1, #1
+ 2017              	.LVL206:
+ 2018 000a 064D     		ldr	r5, .L169
+ 2019 000c 5118     		adds	r1, r2, r1
+ 2020              	.LVL207:
+ 2021 000e 013A     		subs	r2, r2, #1
+ 2022              	.LVL208:
+ 2023              	.L166:
+ 2024 0010 2300     		movs	r3, r4
+ 2025 0012 0340     		ands	r3, r0
+ 2026 0014 EB5C     		ldrb	r3, [r5, r3]
+ 2027 0016 0139     		subs	r1, r1, #1
+ 2028              	.LVL209:
+ 2029 0018 4B70     		strb	r3, [r1, #1]
+ 368:Src/slcan_port/slcan.c **** 		len--;
+ 2030              		.loc 1 368 0
+ 2031 001a 0009     		lsrs	r0, r0, #4
+ 2032              	.LVL210:
+ 366:Src/slcan_port/slcan.c **** 		out[len-1] = hex_str_map[data & 0xf];
+ 2033              		.loc 1 366 0
+ 2034 001c 9142     		cmp	r1, r2
+ 2035 001e F7D1     		bne	.L166
+ 2036              	.LVL211:
+ 2037              	.L164:
+ 370:Src/slcan_port/slcan.c **** 	}
+ 371:Src/slcan_port/slcan.c **** }
+ 2038              		.loc 1 371 0
+ 2039              		@ sp needed
+ 2040 0020 30BD     		pop	{r4, r5, pc}
+ 2041              	.L170:
+ 2042 0022 C046     		.align	2
+ 2043              	.L169:
+ 2044 0024 00000000 		.word	.LANCHOR0
+ 2045              		.cfi_endproc
+ 2046              	.LFE60:
+ 2048              		.section	.text.onlytest,"ax",%progbits
+ 2049              		.align	2
+ 2050              		.global	onlytest
+ 2051              		.code	16
+ 2052              		.thumb_func
+ 2054              	onlytest:
+ 2055              	.LFB61:
+ 372:Src/slcan_port/slcan.c **** 
+ 373:Src/slcan_port/slcan.c **** 
+ 374:Src/slcan_port/slcan.c **** void onlytest(char * uart_str){
+ARM GAS  /tmp/ccTu2vyu.s 			page 48
+
+
+ 2056              		.loc 1 374 0
+ 2057              		.cfi_startproc
+ 2058              		@ args = 0, pretend = 0, frame = 0
+ 2059              		@ frame_needed = 0, uses_anonymous_args = 0
+ 2060              	.LVL212:
+ 2061 0000 10B5     		push	{r4, lr}
+ 2062              	.LCFI39:
+ 2063              		.cfi_def_cfa_offset 8
+ 2064              		.cfi_offset 4, -8
+ 2065              		.cfi_offset 14, -4
+ 2066              		.loc 1 374 0
+ 2067 0002 0400     		movs	r4, r0
+ 375:Src/slcan_port/slcan.c **** 	slcan_cdc_process(uart_str,strlen(uart_str));
+ 2068              		.loc 1 375 0
+ 2069 0004 FFF7FEFF 		bl	strlen
+ 2070              	.LVL213:
+ 2071 0008 0100     		movs	r1, r0
+ 2072 000a 2000     		movs	r0, r4
+ 2073 000c FFF7FEFF 		bl	slcan_cdc_process
+ 2074              	.LVL214:
+ 376:Src/slcan_port/slcan.c **** }
+ 2075              		.loc 1 376 0
+ 2076              		@ sp needed
+ 2077              	.LVL215:
+ 2078 0010 10BD     		pop	{r4, pc}
+ 2079              		.cfi_endproc
+ 2080              	.LFE61:
+ 2082              		.global	hex_str_map
+ 2083              		.global	bitrate_map
+ 2084              		.global	cmd_buf_off
+ 2085              		.global	cmd_buf
+ 2086 0012 C046     		.section	.rodata.bitrate_map,"a",%progbits
+ 2087              		.align	2
+ 2088              		.set	.LANCHOR1,. + 0
+ 2091              	bitrate_map:
+ 2092 0000 20030000 		.word	800
+ 2093 0004 90010000 		.word	400
+ 2094 0008 A0000000 		.word	160
+ 2095 000c 50000000 		.word	80
+ 2096 0010 40000000 		.word	64
+ 2097 0014 20000000 		.word	32
+ 2098 0018 10000000 		.word	16
+ 2099 001c 0A000000 		.word	10
+ 2100 0020 08000000 		.word	8
+ 2101              		.section	.rodata.hex_str_map,"a",%progbits
+ 2102              		.align	2
+ 2103              		.set	.LANCHOR0,. + 0
+ 2106              	hex_str_map:
+ 2107 0000 30       		.byte	48
+ 2108 0001 31       		.byte	49
+ 2109 0002 32       		.byte	50
+ 2110 0003 33       		.byte	51
+ 2111 0004 34       		.byte	52
+ 2112 0005 35       		.byte	53
+ 2113 0006 36       		.byte	54
+ 2114 0007 37       		.byte	55
+ 2115 0008 38       		.byte	56
+ARM GAS  /tmp/ccTu2vyu.s 			page 49
+
+
+ 2116 0009 39       		.byte	57
+ 2117 000a 41       		.byte	65
+ 2118 000b 42       		.byte	66
+ 2119 000c 43       		.byte	67
+ 2120 000d 44       		.byte	68
+ 2121 000e 45       		.byte	69
+ 2122 000f 46       		.byte	70
+ 2123              		.section	.bss.cmd_buf_off,"aw",%nobits
+ 2124              		.align	2
+ 2125              		.set	.LANCHOR2,. + 0
+ 2128              	cmd_buf_off:
+ 2129 0000 00000000 		.space	4
+ 2130              		.section	.rodata.str1.4,"aMS",%progbits,1
+ 2131              		.align	2
+ 2132              	.LC0:
+ 2133 0000 7A0D00   		.ascii	"z\015\000"
+ 2134 0003 00       		.space	1
+ 2135              	.LC11:
+ 2136 0004 0D00     		.ascii	"\015\000"
+ 2137              		.section	.bss.cmd_buf,"aw",%nobits
+ 2138              		.align	2
+ 2139              		.set	.LANCHOR3,. + 0
+ 2142              	cmd_buf:
+ 2143 0000 00000000 		.space	50
+ 2143      00000000 
+ 2143      00000000 
+ 2143      00000000 
+ 2143      00000000 
+ 2144              		.text
+ 2145              	.Letext0:
+ 2146              		.file 2 "/opt/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/machine/_default_types.h"
+ 2147              		.file 3 "/opt/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/sys/_stdint.h"
+ 2148              		.file 4 "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f042x6.h"
+ 2149              		.file 5 "Drivers/CMSIS/Device/ST/STM32F0xx/Include/stm32f0xx.h"
+ 2150              		.file 6 "Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_def.h"
+ 2151              		.file 7 "Drivers/STM32F0xx_HAL_Driver/Inc/stm32f0xx_hal_can.h"
+ 2152              		.file 8 "Src/slcan_port/slcan.h"
+ 2153              		.file 9 "Inc/main.h"
+ 2154              		.file 10 "Inc/usbd_cdc_if.h"
+ 2155              		.file 11 "/opt/gcc-arm-none-eabi-5_4-2016q3/arm-none-eabi/include/string.h"
+ARM GAS  /tmp/ccTu2vyu.s 			page 50
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 slcan.c
+     /tmp/ccTu2vyu.s:20     .text.cmd_reff.part.3:00000000 $t
+     /tmp/ccTu2vyu.s:24     .text.cmd_reff.part.3:00000000 cmd_reff.part.3
+     /tmp/ccTu2vyu.s:48     .text.cmd_reff.part.3:0000000c $d
+     /tmp/ccTu2vyu.s:24     .text.cmd_reff.part.3:00000000 cmd_sff.part.0
+     /tmp/ccTu2vyu.s:24     .text.cmd_reff.part.3:00000000 cmd_eff.part.1
+     /tmp/ccTu2vyu.s:24     .text.cmd_reff.part.3:00000000 cmd_rsff.part.2
+     /tmp/ccTu2vyu.s:56     .text.sff_to_cmd:00000000 $t
+     /tmp/ccTu2vyu.s:61     .text.sff_to_cmd:00000000 sff_to_cmd
+     /tmp/ccTu2vyu.s:262    .text.sff_to_cmd:0000008c $d
+     /tmp/ccTu2vyu.s:267    .text.eff_to_cmd:00000000 $t
+     /tmp/ccTu2vyu.s:272    .text.eff_to_cmd:00000000 eff_to_cmd
+     /tmp/ccTu2vyu.s:436    .text.eff_to_cmd:00000084 $d
+     /tmp/ccTu2vyu.s:441    .text.rsff_to_cmd:00000000 $t
+     /tmp/ccTu2vyu.s:446    .text.rsff_to_cmd:00000000 rsff_to_cmd
+     /tmp/ccTu2vyu.s:544    .text.rsff_to_cmd:00000044 $d
+     /tmp/ccTu2vyu.s:549    .text.reff_to_cmd:00000000 $t
+     /tmp/ccTu2vyu.s:554    .text.reff_to_cmd:00000000 reff_to_cmd
+     /tmp/ccTu2vyu.s:648    .text.reff_to_cmd:0000003c $d
+     /tmp/ccTu2vyu.s:653    .text.HAL_CAN_RxFifo0MsgPendingCallback:00000000 $t
+     /tmp/ccTu2vyu.s:658    .text.HAL_CAN_RxFifo0MsgPendingCallback:00000000 HAL_CAN_RxFifo0MsgPendingCallback
+     /tmp/ccTu2vyu.s:766    .text.cmd_version:00000000 $t
+     /tmp/ccTu2vyu.s:771    .text.cmd_version:00000000 cmd_version
+     /tmp/ccTu2vyu.s:826    .text.cmd_sn:00000000 $t
+     /tmp/ccTu2vyu.s:831    .text.cmd_sn:00000000 cmd_sn
+     /tmp/ccTu2vyu.s:910    .text.cmd_sn:00000040 $d
+     /tmp/ccTu2vyu.s:916    .text.cmd_open:00000000 $t
+     /tmp/ccTu2vyu.s:921    .text.cmd_open:00000000 cmd_open
+     /tmp/ccTu2vyu.s:964    .text.cmd_open:00000028 $d
+     /tmp/ccTu2vyu.s:969    .text.cmd_close:00000000 $t
+     /tmp/ccTu2vyu.s:974    .text.cmd_close:00000000 cmd_close
+     /tmp/ccTu2vyu.s:1017   .text.cmd_close:00000028 $d
+     /tmp/ccTu2vyu.s:1022   .text.cmd_timestamp:00000000 $t
+     /tmp/ccTu2vyu.s:1027   .text.cmd_timestamp:00000000 cmd_timestamp
+     /tmp/ccTu2vyu.s:1051   .text.cmd_timestamp:0000000c $d
+     /tmp/ccTu2vyu.s:1056   .text.cmd_set_btr:00000000 $t
+     /tmp/ccTu2vyu.s:1061   .text.cmd_set_btr:00000000 cmd_set_btr
+     /tmp/ccTu2vyu.s:1078   .text.hex2int:00000000 $t
+     /tmp/ccTu2vyu.s:1083   .text.hex2int:00000000 hex2int
+     /tmp/ccTu2vyu.s:1198   .text.cmd_set_bitrate:00000000 $t
+     /tmp/ccTu2vyu.s:1203   .text.cmd_set_bitrate:00000000 cmd_set_bitrate
+     /tmp/ccTu2vyu.s:1272   .text.cmd_set_bitrate:00000044 $d
+     /tmp/ccTu2vyu.s:1278   .text.cmd_sff:00000000 $t
+     /tmp/ccTu2vyu.s:1283   .text.cmd_sff:00000000 cmd_sff
+     /tmp/ccTu2vyu.s:1390   .text.cmd_sff:00000074 $d
+     /tmp/ccTu2vyu.s:1395   .text.cmd_eff:00000000 $t
+     /tmp/ccTu2vyu.s:1400   .text.cmd_eff:00000000 cmd_eff
+     /tmp/ccTu2vyu.s:1507   .text.cmd_eff:00000078 $d
+     /tmp/ccTu2vyu.s:1512   .text.cmd_rsff:00000000 $t
+     /tmp/ccTu2vyu.s:1517   .text.cmd_rsff:00000000 cmd_rsff
+     /tmp/ccTu2vyu.s:1596   .text.cmd_rsff:00000054 $d
+     /tmp/ccTu2vyu.s:1601   .text.cmd_reff:00000000 $t
+     /tmp/ccTu2vyu.s:1606   .text.cmd_reff:00000000 cmd_reff
+     /tmp/ccTu2vyu.s:1684   .text.cmd_reff:00000058 $d
+     /tmp/ccTu2vyu.s:1689   .text.slcan_cmd_task:00000000 $t
+     /tmp/ccTu2vyu.s:1694   .text.slcan_cmd_task:00000000 slcan_cmd_task
+ARM GAS  /tmp/ccTu2vyu.s 			page 51
+
+
+     /tmp/ccTu2vyu.s:1717   .rodata.slcan_cmd_task:00000000 $d
+     /tmp/ccTu2vyu.s:1851   .text.slcan_cmd_task:00000058 $d
+     /tmp/ccTu2vyu.s:1857   .text.slcan_cdc_process:00000000 $t
+     /tmp/ccTu2vyu.s:1862   .text.slcan_cdc_process:00000000 slcan_cdc_process
+     /tmp/ccTu2vyu.s:1987   .text.slcan_cdc_process:00000084 $d
+     /tmp/ccTu2vyu.s:1993   .text.int2hex:00000000 $t
+     /tmp/ccTu2vyu.s:1998   .text.int2hex:00000000 int2hex
+     /tmp/ccTu2vyu.s:2044   .text.int2hex:00000024 $d
+     /tmp/ccTu2vyu.s:2049   .text.onlytest:00000000 $t
+     /tmp/ccTu2vyu.s:2054   .text.onlytest:00000000 onlytest
+     /tmp/ccTu2vyu.s:2106   .rodata.hex_str_map:00000000 hex_str_map
+     /tmp/ccTu2vyu.s:2091   .rodata.bitrate_map:00000000 bitrate_map
+     /tmp/ccTu2vyu.s:2128   .bss.cmd_buf_off:00000000 cmd_buf_off
+     /tmp/ccTu2vyu.s:2142   .bss.cmd_buf:00000000 cmd_buf
+     /tmp/ccTu2vyu.s:2087   .rodata.bitrate_map:00000000 $d
+     /tmp/ccTu2vyu.s:2102   .rodata.hex_str_map:00000000 $d
+     /tmp/ccTu2vyu.s:2124   .bss.cmd_buf_off:00000000 $d
+     /tmp/ccTu2vyu.s:2131   .rodata.str1.4:00000000 $d
+     /tmp/ccTu2vyu.s:2138   .bss.cmd_buf:00000000 $d
+                     .debug_frame:00000010 $d
+
+UNDEFINED SYMBOLS
+CDC_Transmit_FS
+HAL_CAN_GetRxFifoFillLevel
+HAL_CAN_GetRxMessage
+memset
+HAL_CAN_Start
+hcan
+HAL_CAN_Stop
+HAL_CAN_Init
+HAL_CAN_AddTxMessage
+memcpy
+strlen
