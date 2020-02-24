@@ -20,7 +20,7 @@ st-flash --reset write ./build/usb2can.bin 0x08000000
 基于slcan/socketcan的软件都可以应用到当前设备，python-can、can-utils等     
 * 安装can-utils  
 apt install can-utils
-* 建立socketcan设备
+* 建立socketcan设备  
 slcand -o -s8 /dev/ttyACM0 can0   
 ip link set up can0
 * 收发报文
